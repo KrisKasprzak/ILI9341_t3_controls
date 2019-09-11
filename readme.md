@@ -21,5 +21,5 @@ The objects are smart and automatically filter out press outside the controls ra
 While this library was created for the ILI9341_t3 and intended for Teensy-based MCU's, the library may be adaptable to other display drivers. Note the driver must use the Adafruit_GFX libraries. To allow other display drivers, modify the lines in the .h and .cpp files to allow a different driver to be passed in. For example change call such as SliderH(ILI9341_t3 *disp,... to SliderH(Adafruit_RA8875 *disp,...
 <br>
 <br>
-<img src="Equalizer.bmp"> <img src="ColorPicker.bmp">
-![Equalizer](https://github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.bmp)
+<img src="www.github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.bmp"> <img src="ColorPicker.bmp">
+![Equalizer](https://www.github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.bmp)
