@@ -22,4 +22,4 @@ While this library was created for the ILI9341_t3 and intended for Teensy-based 
 <br>
 <br>
 <img src="Equalizer.bmp"> <img src="ColorPicker.bmp">
-![Equalizer](Equalizer.bmp)
+![Equalizer](https://github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.bmp)
