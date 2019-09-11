@@ -4,7 +4,7 @@
 
 
 
-This library will let programmers add slider-type controls to their projhects. This library is intended to be used with ILI9341_t3 libraries and TFT LCD's that support touch. Users can add vertical, horizontal, or on/off sliders. Typical applications are volume controls, brightness controls, and on/off like buttons. Multiple controls can be added allow the UI creation of a graphic equalizer. Users can control location, length of scale, colors, display of tick marks, and scale snapping. Users specify the lenght of slider and both low and high limits, and the slider control draws a drag handle and upon drag returns the scaled value that will lay between the limits. Scale can be floats to bytes. 
+This library will let programmers add slider-type controls to their projects. This library is intended to be used with ILI9341_t3 libraries and TFT LCD's that support touch. Users can add vertical, horizontal, or on/off sliders. Typical applications are volume controls, brightness controls, and on/off like buttons. Multiple controls can be added allow the UI creation of a graphic equalizer. Users can control location, length of scale, colors, display of tick marks, and scale snapping. Users specify the length of slider and both low and high limits, and the slider control draws a drag handle and upon drag returns the scaled value that will lay between the limits. Scale can be floats to bytes. 
 
 
 
