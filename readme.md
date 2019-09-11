@@ -25,3 +25,4 @@ While this library was created for the ILI9341_t3 and intended for Teensy-based 
 ![Equalizer](https://github.com/KrisKasprzak/ILI9341_t3_controls/Equalizer.bmp)
 
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.bmp)
+![header image](https://github.com/KrisKasprzak/ILI9341_t3_controls/blob/master/Equalizer.bmp)
