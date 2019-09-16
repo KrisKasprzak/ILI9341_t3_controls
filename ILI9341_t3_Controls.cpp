@@ -1,6 +1,8 @@
 /*
   The MIT License (MIT)
-  Copyright (c) 2019 Kris Kasrpzak
+
+  library writen by Kris Kasprzak
+  
   Permission is hereby granted, free of charge, to any person obtaining a copy of
   this software and associated documentation files (the "Software"), to deal in
   the Software without restriction, including without limitation the rights to
@@ -15,28 +17,11 @@
   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
   On a personal note, if you develop an application or product using this library 
   and make millions of dollars, I'm happy for you!
 */
 
-/* 
-  Code by Kris Kasprzak kris.kasprzak@yahoo.com
-  This library is intended to be used with EBYTE transcievers, small wireless units for MCU's such as
-  Teensy and Arduino. This library let's users program the operating parameters and both send and recieve data.
-  This company makes several modules with different capabilities, but most #defines here should be compatible with them
-  All constants were extracted from several data sheets and listed in binary as that's how the data sheet represented each setting
-  Hopefully, any changes or additions to constants can be a matter of copying the data sheet constants directly into these #defines
-  Usage of this library consumes around 970 bytes
-  Revision		Data		Author			Description
-  1.0			9/8/2019	Kasprzak		Initial creation
-  
-   Code usage
-  1. Create the horizontal or vertical slider object(s)
-  2. init the slider object(s)
-  4. on screen press, pass the coordinates to the slider object(s). If the slider is being touched, it will update
-  5. process return from MoveSlider 
-  
-*/
 
 
 #include "ILI9341_t3_Controls.h"
@@ -52,9 +37,9 @@ SliderH::SliderH(ILI9341_t3 *disp, uint16_t left, uint16_t top, uint16_t wide, u
 {
 	// map arguements to class variables
 	_d = disp;				
-	_l = (float) left;
-	_t = (float) top;
-	_w = (float) wide;
+	_l = left;
+	_t = top;
+	_w = wide;
 	_sColor = sliderColor;
 	_bColor = backColor;
 	_hColor = handleColor;
@@ -72,9 +57,9 @@ SliderV::SliderV(ILI9341_t3 *disp, uint16_t left, uint16_t top, uint16_t high, u
 {
 	// map arguements to class variables
 	_d = disp;
-	_l = (float) left;
-	_t = (float) top;
-	_h = (float) high;
+	_l = left;
+	_t = top;
+	_h = high;
 	_sColor = sliderColor;
 	_bColor = backColor;
 	_hColor = handleColor;
@@ -117,7 +102,7 @@ void SliderV::init(float scaleLow, float scaleHi, float scale, float snap) {
 	_sh = scaleHi;
 	_sc = 0.0;
 	_sn = 0.0;
-
+	_colorscale = false;
 	// compute scale increments and snap increments
 	if (scale != 0) {
 		_sc = (_sh - _sl) / scale;
@@ -143,8 +128,8 @@ void SliderH::init(float scaleLow, float scaleHi, float scale, float snap ) {
 	_sh = scaleHi;
 	_sc = 0.0;
 	_sn = 0.0;
+	_colorscale = false;
 
-	// compute scale increments and snap increments
 	if (scale != 0) {
 		_sc =  (_sh - _sl ) /  scale ;
 		_ce = abs(_sl / scale);
@@ -152,7 +137,7 @@ void SliderH::init(float scaleLow, float scaleHi, float scale, float snap ) {
 	if (snap != 0) {
 		_sn = (_sh - _sl) / snap;
 	}
-
+	
 }
 
 /*
@@ -223,26 +208,37 @@ remember the postion for painting over the original
 */
 void  SliderH::draw(float val) {
 	
-	_d->fillCircle(_ox, _t, BALL_DIA, _bColor);
-	_d->fillRect(_l, _t, _w , BALL_DIA / 2, _sColor);
+		_d->fillCircle(_ox, _t, BALL_DIA, _bColor);
+		_pos = mapF(val, _sl, _sh, (float) _l, (float) _l + (float) _w);
+		_ox = _pos;
+		
+		if (_colorscale){
+			_d->fillRect(_l, _t, _ox - _l, BALL_DIA / 2, _hColor);
+			_d->fillRect(_ox, _t, _w - _ox + _l, BALL_DIA / 2, _sColor);
 
-	if (_sc != 0.0) {
-		for (i = 0; i <= _sc; i++){
+		}
+		else{
+			_d->fillRect(_l, _t, _w, BALL_DIA / 2, _sColor);
+		}
 
-			_d->fillRect((i * (_w / _sc) )+ _l, _t-2, 1, BALL_DIA, _sColor);
-			
-			if ((i == _ce) | (i == 0) | (i == _sc)) {
-				_d->fillRect((i * (_w / _sc)) + _l, _t - 2, 4, BALL_DIA, _sColor);
+		if (_sc != 0.0) {
+			for (i = 0; i <= _sc; i++){
+				
+				_d->fillRect((i * (_w / _sc) ) + _l, _t-2, 1, BALL_DIA, _sColor);
+
+				if ((i == _ce) | (i == 0) | (i == _sc)) {
+					_d->fillRect((i * (_w / _sc)) + _l, _t - 2, 4, BALL_DIA, _sColor);
+				}
 			}
 		}
-	}
-	_changed = false;
-	_pos = mapF(val, _sl, _sh, _l, _l + _w);
-	_d->fillCircle(_pos,_t,BALL_DIA,_hColor);
-	_d->drawCircle(_pos,_t,BALL_DIA,_sColor);
-	_d->drawCircle(_pos,_t,BALL_DIA-1,_sColor);
-	_ox = _pos;
-	_pos = val;
+		_changed = false;
+		
+		_d->fillCircle(_pos,_t,BALL_DIA,_hColor);
+		_d->drawCircle(_pos,_t,BALL_DIA,_sColor);
+		_d->drawCircle(_pos,_t,BALL_DIA-1,_sColor);
+
+		_ox = _pos;
+		_pos = val;
 	
 }
 
@@ -264,8 +260,17 @@ remember the postion for painting over the original
 void  SliderV::draw(float val) {
 	
 	_d->fillCircle(_l, _oy, BALL_DIA, _bColor);
-	_d->fillRect(_l - (BALL_DIA/4), _t, BALL_DIA / 2, _h, _sColor);
+	_pos = mapF(val, _sl, _sh, (float) _t + (float) _h, (float) _t );
+	_oy = _pos;
 
+	if (_colorscale){
+		_d->fillRect(_l - BALL_DIA / 4, _t, BALL_DIA / 2, _oy - _t, _sColor); // draw new slider
+		_d->fillRect(_l - BALL_DIA / 4, _oy, BALL_DIA / 2, _h - _oy + _t, _hColor); // draw new slider
+	}
+	else {
+		_d->fillRect(_l - (BALL_DIA/4), _t, BALL_DIA / 2, _h, _sColor);
+	}
+	
 	if (_sc != 0.0) {
 		for (i = 0; i <= _sc; i++){
 
@@ -277,10 +282,11 @@ void  SliderV::draw(float val) {
 		}
 	}
 	_changed = false;
-	_pos = mapF(val, _sl, _sh, _t + _h, _t );
+	
 	_d->fillCircle(_l,_pos,BALL_DIA,_hColor);
 	_d->drawCircle(_l,_pos,BALL_DIA,_sColor);
 	_d->drawCircle(_l,_pos,BALL_DIA-1,_sColor);
+
 	_oy = _pos;
 	_pos = val;
 	
@@ -330,27 +336,33 @@ remember the postion for painting over the original
 */
 
 float  SliderH::slide(float x,float y){
-	
+
 	// get snap increment
 	if (_sn != 0.0 ) {
  		x = x + BALL_DIA;  
 		x = x - _l;
-		x =  (int)      (x /  (_w / _sn));
+		x =  (int) (x /  (_w / _sn));
 		x = (x *  (_w / _sn)) + _l;
-		
 	}
-
 	// draw ball and scale
 	if (x != _ox){
-		
-		if ( (x >= _l ) & (x <= (_l + _w  ) ) ) {
+
+		if ((x >= _l) & (x <= (_l + _w))) {
 
 			if ((abs(y - _t)) <= BALL_DIA) {
 
 				// it's in range of ball
-				
-				_d->fillCircle(_ox,_t,BALL_DIA,_bColor);
-				_d->fillRect(_l,_t,_w,BALL_DIA/2,_sColor);
+				_d->fillCircle(_ox, _t, BALL_DIA, _bColor);
+
+				if (_colorscale){
+					_d->fillRect(_l, _t, x-_l, BALL_DIA / 2, _hColor);
+					_d->fillRect(x, _t, _w - x + _l, BALL_DIA / 2, _sColor);
+
+				}
+				else{
+					_d->fillRect(_l, _t, _w, BALL_DIA / 2, _sColor);
+				}
+						
 
 				if (_sc != 0.0) {
 					for (i = 0; i <= _sc; i++){
@@ -361,17 +373,19 @@ float  SliderH::slide(float x,float y){
 					}
 				}
 
-				_d->fillCircle(x,_t,BALL_DIA,_hColor);
-				_d->drawCircle(x,_t,BALL_DIA,_sColor);
-				_d->drawCircle(x,_t,BALL_DIA-1,_sColor);
+				_changed = true;
+				_d->fillCircle(x, _t, BALL_DIA, _hColor);
+				_d->drawCircle(x, _t, BALL_DIA, _sColor);
+				_d->drawCircle(x, _t, BALL_DIA - 1, _sColor);
 				_ox = x;
 
 				// get scaled val and pass back
-				 _pos = mapF(x, _l, _l + _w, _sl, _sh);
-				 _changed = true;
+				_pos = mapF(x, (float) _l, (float) _l + (float) _w, _sl, _sh);
+				
 			}
 		}
 	}
+
 
 	return _pos;
 }
@@ -391,7 +405,7 @@ remember the postion for painting over the original
 
 */
 
-float  SliderV::slide(float x,float y ){
+float  SliderV::slide(uint16_t x, uint16_t y){
 	
 	if (_sn != 0.0) {
 		y = y - _t;
@@ -404,10 +418,18 @@ float  SliderV::slide(float x,float y ){
 		if (abs(x - (_l - BALL_DIA)) < BALL_DIA) {
 
 			if ((y >= _t) & (y <= (_t + _h))) {
+				
 				// it's in rage of ball
-				_d->fillCircle(_l, _oy, BALL_DIA, _bColor);
-				_d->fillRect(_l - BALL_DIA / 4, _t, BALL_DIA / 2, _h, _sColor);
+				_d->fillCircle(_l, _oy, BALL_DIA, _bColor);  // blaok out ball
 
+				if (_colorscale){
+					_d->fillRect(_l - BALL_DIA / 4, _t, BALL_DIA / 2, y - _t, _sColor); // draw new slider
+					_d->fillRect(_l - BALL_DIA / 4, y, BALL_DIA / 2,_h- y +_t , _hColor); // draw new slider
+				}
+				else {
+					_d->fillRect(_l - BALL_DIA / 4, _t, BALL_DIA / 2, _h, _sColor); // draw new slider
+				}
+				
 				if (_sc != 0.0) {
 					for (i = 0; i <= _sc; i++){
 
@@ -426,7 +448,8 @@ float  SliderV::slide(float x,float y ){
 				_oy = y;
 
 				// get scaled val and pass back
-				_pos = mapF(y, _t, _t + _h, _sh, _sl);
+				_pos = mapF(y, (float) _t, (float) _t + (float) _h, _sh, _sl);
+				
 			}
 		}
 	}
@@ -526,6 +549,19 @@ bool SliderH::changed(){
 	return false;
 
 }
+void SliderH::drawSliderColor(bool val){
+
+	_colorscale = val;
+
+}
+
+void SliderV::drawSliderColor(bool val){
+
+	_colorscale = val;
+
+}
+
+
 
 /*
 
