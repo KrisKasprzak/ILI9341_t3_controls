@@ -224,10 +224,10 @@ void  SliderH::draw(float val) {
 		if (_sc != 0.0) {
 			for (i = 0; i <= _sc; i++){
 				
-				_d->fillRect((i * (_w / _sc) ) + _l, _t-2, 1, BALL_DIA, _sColor);
+				_d->fillRect((i * (_w / _sc) ) + _l, _t-3, 1, BALL_DIA+1, _sColor);
 
 				if ((i == _ce) | (i == 0) | (i == _sc)) {
-					_d->fillRect((i * (_w / _sc)) + _l, _t - 2, 4, BALL_DIA, _sColor);
+					_d->fillRect((i * (_w / _sc)) + _l, _t - 3, 4, BALL_DIA+1, _sColor);
 				}
 			}
 		}
@@ -274,10 +274,10 @@ void  SliderV::draw(float val) {
 	if (_sc != 0.0) {
 		for (i = 0; i <= _sc; i++){
 
-			_d->fillRect(_l - 5,(i * (_h / _sc) ) + _t, BALL_DIA, 1, _sColor);
+			_d->fillRect(_l - 5,(i * (_h / _sc) ) + _t, BALL_DIA+1, 1, _sColor);
 
 			if ((i == _ce) | (i == 0) | (i == _sc)) {
-				_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA, 4, _sColor);
+				_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA+1, 4, _sColor);
 			}
 		}
 	}
@@ -366,9 +366,9 @@ float  SliderH::slide(float x,float y){
 
 				if (_sc != 0.0) {
 					for (i = 0; i <= _sc; i++){
-						_d->fillRect((i * (_w / _sc)) + _l, _t - 2, 1, BALL_DIA, _sColor);
+						_d->fillRect((i * (_w / _sc)) + _l, _t - 3, 1, BALL_DIA+1, _sColor);
 						if ((i == _ce) | (i == 0) | (i == _sc)) {
-							_d->fillRect((i * (_w / _sc)) + _l, _t - 2, 4, BALL_DIA, _sColor);
+							_d->fillRect((i * (_w / _sc)) + _l, _t - 3, 4, BALL_DIA+1, _sColor);
 						}
 					}
 				}
@@ -433,10 +433,10 @@ float  SliderV::slide(uint16_t x, uint16_t y){
 				if (_sc != 0.0) {
 					for (i = 0; i <= _sc; i++){
 
-						_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA, 1, _sColor);
+						_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA+1, 1, _sColor);
 
 						if ((i == _ce) | (i == 0) | (i == _sc)) {
-							_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA, 4, _sColor);
+							_d->fillRect(_l - 5, (i * (_h / _sc)) + _t, BALL_DIA+1, 4, _sColor);
 						}
 
 					}
