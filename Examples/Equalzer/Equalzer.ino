@@ -1,14 +1,8 @@
 /*
 
-  Revision table
-  ________________________________
-  rev   author      date        desc
-
-
   MCU                       https://www.amazon.com/Teensy-3-2-with-pins/dp/B015QUPO5Y/ref=sr_1_2?s=industrial&ie=UTF8&qid=1510373806&sr=1-2&keywords=teensy+3.2
   Display                   https://www.amazon.com/Wrisky-240x320-Serial-Module-ILI9341/dp/B01KX26JJU/ref=sr_1_10?ie=UTF8&qid=1510373771&sr=8-10&keywords=240+x+320+tft
   display library           https://github.com/PaulStoffregen/ILI9341_t3
-  font library              https://github.com/PaulStoffregen/ILI9341_fonts
   touchscreen lib           https://github.com/dgolda/UTouch
 
 */
@@ -106,14 +100,23 @@ void setup() {
   pinMode(LCD_PIN, OUTPUT);
 
   // initialize the sliders
-  sBand1.init(-12, 12, 2, 1);
-  sBand2.init(-12, 12, 2, 1);
-  sBand3.init(-12, 12, 2, 1);
-  sBand4.init(-12, 12, 2, 1);
-  sBand5.init(-12, 12, 2, 1);
-  sBand6.init(-12, 12, 2, 1);
-  sBand7.init(-12, 12, 2, 1);
-  sBand8.init(-12, 12, 2, 1);
+  sBand1.init(-12, 12, 3, 0);
+  sBand2.init(-12, 12, 3, 0);
+  sBand3.init(-12, 12, 3, 0);
+  sBand4.init(-12, 12, 3, 0);
+  sBand5.init(-12, 12, 3, 0);
+  sBand6.init(-12, 12, 3, 0);
+  sBand7.init(-12, 12, 3, 0);
+  sBand8.init(-12, 12, 3, 0);
+
+  sBand1.drawSliderColor(true);
+  sBand2.drawSliderColor(true);
+  sBand3.drawSliderColor(true);
+  sBand4.drawSliderColor(true);
+  sBand5.drawSliderColor(true);
+  sBand6.drawSliderColor(true);
+  sBand7.drawSliderColor(true);
+  sBand8.drawSliderColor(true);
 
   // fire up the display
   Display.begin();
@@ -143,7 +146,6 @@ void setup() {
   Display.setCursor(10 , 10 );
   Display.print(F("Equalizer"));
   Display.setTextSize(1);
-
 
   Display.setCursor(BAND1 , 30 ); Display.print(Band1);
   Display.setCursor(BAND2 , 30 ); Display.print(Band2);
@@ -186,7 +188,6 @@ void loop() {
     Band7 = sBand7.slide(BtnX, BtnY);
     Band8 = sBand8.slide(BtnX, BtnY);
 
-
     if (sBand1.changed()) {
       Display.fillRect(BAND1, 28, BAND2 - BAND1, 10, C_BLACK);
       Display.setCursor(BAND1 , 30 ); Display.print(Band1);
@@ -219,17 +220,5 @@ void loop() {
       Display.fillRect(BAND8, 28, 320 - BAND8, 10, C_BLACK);
       Display.setCursor(BAND8 , 30 ); Display.print(Band8);
     }
-
-
-    Serial.println("___________________________");
-    Serial.print("Band 1 "); Serial.println(Band1);
-    Serial.print("Band 2 "); Serial.println(Band2);
-    Serial.print("Band 3 "); Serial.println(Band3);
-    Serial.print("Band 4 "); Serial.println(Band4);
-    Serial.print("Band 5 "); Serial.println(Band5);
-    Serial.print("Band 6 "); Serial.println(Band6);
-    Serial.print("Band 7 "); Serial.println(Band7);
-    Serial.print("Band 8 "); Serial.println(Band8);
-
   }
 }
