@@ -1,14 +1,8 @@
 /*
 
-  Revision table
-  ________________________________
-  rev   author      date        desc
-
-
   MCU                       https://www.amazon.com/Teensy-3-2-with-pins/dp/B015QUPO5Y/ref=sr_1_2?s=industrial&ie=UTF8&qid=1510373806&sr=1-2&keywords=teensy+3.2
   Display                   https://www.amazon.com/Wrisky-240x320-Serial-Module-ILI9341/dp/B01KX26JJU/ref=sr_1_10?ie=UTF8&qid=1510373771&sr=8-10&keywords=240+x+320+tft
   display library           https://github.com/PaulStoffregen/ILI9341_t3
-  font library              https://github.com/PaulStoffregen/ILI9341_fonts
   touchscreen lib           https://github.com/dgolda/UTouch
 
 */
@@ -62,6 +56,13 @@
 #define C_DKPURPLE    0x4010
 #define C_DKGREY      0x4A49
 
+byte RedByte = 70, GreenByte = 170, BlueByte = 210;
+byte BrightByte = 255;
+int BtnX, BtnY;
+bool enableSliders = true;
+bool lockSliders = false;
+char buf[14];
+
 // create display and DS objects
 ILI9341_t3 Display = ILI9341_t3(10, 9);
 
@@ -77,22 +78,16 @@ SliderH Blue(&Display, 20, ROW4, 100, C_WHITE, C_BLACK, C_BLUE);
 SliderOnOff Enable(&Display, 190, 20, 50, 30, C_WHITE, C_BLACK, C_GREEN, C_DKGREY);
 SliderOnOff Lock(&Display, 70, 50, 50, 30, C_WHITE, C_BLACK, C_GREEN, C_DKGREY);
 
-byte RedByte = 0, GreenByte = 0, BlueByte = 0;
-byte BrightByte = 255;
-int BtnX, BtnY;
-bool enableSliders = true;
-bool lockSliders = false;
-
 void setup() {
 
   Serial.begin(9600);
 
   pinMode(LCD_PIN, OUTPUT);
 
-  Bright.init(0, 255);
-  Red.init(0, 255);
-  Green.init(0, 255);
-  Blue.init(0, 255);
+  Bright.init (  55, 255, 0, 0);
+  Red.init    ( 0, 255, 127.5, 1);
+  Green.init  ( 0, 255, 63.75, 1);
+  Blue.init   ( 0, 255, 0, 1);
 
   // fire up the display
   Display.begin();
@@ -115,6 +110,9 @@ void setup() {
   Display.setCursor(10 , 55 );
   Display.print(F("Lock"));
 
+  Red.drawSliderColor(true);
+  Green.drawSliderColor(true);
+  Blue.drawSliderColor(true);
 
   Bright.draw(BrightByte);
   Red.draw(RedByte);
@@ -127,8 +125,9 @@ void setup() {
   Display.drawRect(141, 81, 98, 98, C_WHITE);
   Display.fillRect(142, 82, 96, 96, Display.color565(RedByte, GreenByte, BlueByte));
 
+  sprintf(buf, "%3d,%3d,%3d", RedByte, GreenByte, BlueByte);
   Display.setCursor(140 , 200 );
-  Display.print(RedByte); Display.print(F(",")); Display.print(GreenByte); Display.print(F(",")); Display.print(BlueByte);
+  Display.print(buf);
 
 }
 
@@ -155,18 +154,40 @@ void loop() {
     GreenByte = Green.slide(BtnX, BtnY);
     BlueByte = Blue.slide(BtnX, BtnY);
 
+    if (Lock.changed()) {
+      if (lockSliders) {
+        Red.drawSliderColor(false);
+        Green.drawSliderColor(false);
+        Blue.drawSliderColor(false);
+        Red.draw(RedByte);
+        Green.draw(RedByte);
+        Blue.draw(RedByte);
+      }
+      else {
+        Red.drawSliderColor(true);
+        Green.drawSliderColor(true);
+        Blue.drawSliderColor(true);
+        Red.draw(RedByte);
+        Green.draw(RedByte);
+        Blue.draw(RedByte);
+      }
+    }
+
     if (lockSliders) {
       if (Red.changed()) {
+        Red.draw(RedByte);
         Green.draw(RedByte);
         Blue.draw(RedByte);
       }
       if (Green.changed()) {
         Red.draw(GreenByte);
+        Green.draw(GreenByte);
         Blue.draw(GreenByte);
       }
       if (Blue.changed()) {
         Red.draw(BlueByte);
         Green.draw(BlueByte);
+        Blue.draw(BlueByte);
       }
     }
 
@@ -189,14 +210,13 @@ void loop() {
     }
   }
 
-
   Display.drawRect(140, 80, 100, 100, C_WHITE);
   Display.drawRect(141, 81, 98, 98, C_WHITE);
   Display.fillRect(142, 82, 96, 96, Display.color565(RedByte, GreenByte, BlueByte));
 
   analogWrite(LCD_PIN, BrightByte);
-
+  sprintf(buf, "%3d,%3d,%3d", RedByte, GreenByte, BlueByte);
   Display.setCursor(140 , 200 );
-  Display.print(RedByte); Display.print(F(",")); Display.print(GreenByte); Display.print(F(",")); Display.print(BlueByte);
+  Display.print(buf);
 
 }
