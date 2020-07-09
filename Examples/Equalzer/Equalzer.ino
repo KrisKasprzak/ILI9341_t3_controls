@@ -1,0 +1,226 @@
+/*
+
+  MCU                       https://www.amazon.com/Teensy-3-2-with-pins/dp/B015QUPO5Y/ref=sr_1_2?s=industrial&ie=UTF8&qid=1510373806&sr=1-2&keywords=teensy+3.2
+  Display                   https://www.amazon.com/Wrisky-240x320-Serial-Module-ILI9341/dp/B01KX26JJU/ref=sr_1_10?ie=UTF8&qid=1510373771&sr=8-10&keywords=240+x+320+tft
+  display library           https://github.com/PaulStoffregen/ILI9341_t3
+  touchscreen lib           https://github.com/dgolda/UTouch
+
+*/
+
+#include <ILI9341_t3.h>           // fast display driver lib
+#include "UTouch.h"               // touchscreen lib
+#include <ILI9341_t3_Controls.h>  // custom control define file
+
+#define TFT_DC 9       // DC pin on LCD
+#define TFT_CS 10      // chip select pin on LCD
+#define LCD_PIN A9     // lcd pin to control brightness
+
+#define ROW1 70
+#define ROW2 110
+#define ROW3 150
+#define ROW4 190
+
+#define BAND1 20
+#define BAND2 60
+#define BAND3 100
+#define BAND4 140
+#define BAND5 180
+#define BAND6 220
+#define BAND7 260
+#define BAND8 300
+
+#define SLIDECOLOR C_GREY
+#define HANDLECOLOR C_ORANGE
+#define BACKCOLOR C_BLACK
+#define TEXTCOLOR C_WHITE
+#define MINDB -12
+#define MAXDB 12
+#define TICK 3
+#define SNAP 0
+
+#define TOP 45
+#define HEIGHT 160
+
+// create some band variables
+int Band1 = 0;
+int Band2 = 0;
+int Band3 = 0;
+int Band4 = 0;
+int Band5 = 0;
+int Band6 = 0;
+int Band7 = 0;
+int Band8 = 0;
+
+int BtnX, BtnY;
+
+// create display and DS objects
+ILI9341_t3 Display = ILI9341_t3(10, 9);
+
+// create the touch screen object
+// UTouch(byte tclk, byte tcs, byte tdin, byte dout, byte irq);
+UTouch  Touch( 6, 5, 4, 3, 2);
+
+// create the slider objects
+SliderV sBand1(&Display, BAND1, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand2(&Display, BAND2, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand3(&Display, BAND3, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand4(&Display, BAND4, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand5(&Display, BAND5, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand6(&Display, BAND6, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand7(&Display, BAND7, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+SliderV sBand8(&Display, BAND8, TOP, HEIGHT, SLIDECOLOR, BACKCOLOR, HANDLECOLOR);
+
+void setup() {
+
+  Serial.begin(9600);
+  pinMode(LCD_PIN, OUTPUT);
+
+  // initialize the sliders
+  sBand1.init(MINDB, MAXDB, TICK, SNAP);
+  sBand2.init(MINDB, MAXDB, TICK, SNAP);
+  sBand3.init(MINDB, MAXDB, TICK, SNAP);
+  sBand4.init(MINDB, MAXDB, TICK, SNAP);
+  sBand5.init(MINDB, MAXDB, TICK, SNAP);
+  sBand6.init(MINDB, MAXDB, TICK, SNAP);
+  sBand7.init(MINDB, MAXDB, TICK, SNAP);
+  sBand8.init(MINDB, MAXDB, TICK, SNAP);
+
+  sBand1.drawSliderColor(true);
+  sBand2.drawSliderColor(true);
+  sBand3.drawSliderColor(true);
+  sBand4.drawSliderColor(true);
+  sBand5.drawSliderColor(true);
+  sBand6.drawSliderColor(true);
+  sBand7.drawSliderColor(true);
+  sBand8.drawSliderColor(true);
+
+  // fire up the display
+  Display.begin();
+
+  // fire up the touch display
+  Touch.InitTouch(PORTRAIT);
+  Touch.setPrecision(PREC_EXTREME);
+  Display.invertDisplay(false);
+  Display.fillScreen(BACKCOLOR);
+  Display.setRotation(1);
+
+  // turn the brightness up
+  analogWrite(LCD_PIN, 255);
+
+  // draw the slider controls
+  sBand1.draw(Band1);
+  sBand2.draw(Band2);
+  sBand3.draw(Band3);
+  sBand4.draw(Band4);
+  sBand5.draw(Band5);
+  sBand6.draw(Band6);
+  sBand7.draw(Band7);
+  sBand8.draw(Band8);
+
+  Display.setTextColor(TEXTCOLOR, BACKCOLOR);
+  Display.setTextSize(2);
+  Display.setCursor(10 , 10 );
+  Display.print(F("Equalizer"));
+  Display.setTextSize(1);
+
+  Display.setCursor(BAND1 , 30 ); Display.print(Band1);
+  Display.setCursor(BAND2 , 30 ); Display.print(Band2);
+  Display.setCursor(BAND3 , 30 ); Display.print(Band3);
+  Display.setCursor(BAND4 , 30 ); Display.print(Band4);
+  Display.setCursor(BAND5 , 30 ); Display.print(Band5);
+  Display.setCursor(BAND6 , 30 ); Display.print(Band6);
+  Display.setCursor(BAND7 , 30 ); Display.print(Band7);
+  Display.setCursor(BAND8 , 30 ); Display.print(Band8);
+
+  Display.setCursor(BAND1 , 220 ); Display.print(F("63"));
+  Display.setCursor(BAND2 , 220 ); Display.print(F("125"));
+  Display.setCursor(BAND3 , 220 ); Display.print(F("250"));
+  Display.setCursor(BAND4 , 220 ); Display.print(F("500"));
+  Display.setCursor(BAND5 , 220 ); Display.print(F("1K"));
+  Display.setCursor(BAND6 , 220 ); Display.print(F("2K"));
+  Display.setCursor(BAND7 , 220 ); Display.print(F("4K"));
+  Display.setCursor(BAND8 , 220 ); Display.print(F("8K"));
+
+}
+
+
+void loop() {
+
+  if (Touch.dataAvailable()) {
+
+    Touch.read();
+
+    BtnX = Touch.getX();
+    BtnY = Touch.getY();
+
+    // this is a mess... displays act different and return different values depending on where touch happened
+    //Serial.print("real coordinates: ");
+    //Serial.print(BtnX);
+    //Serial.print(",");
+    //Serial.println (BtnY);
+    //Display.drawPixel(BtnX, BtnY, C_GREEN);
+
+    //Serial.print("mapped coordinates: ");
+    //Serial.print(BtnX);
+    //Serial.print(",");
+    //Serial.println (BtnY);
+    //Display.drawPixel(BtnX, BtnY, C_RED);
+
+    // these displays are a mess... displays act different and return
+    //different values depending on where touch happened
+
+    // x  = map(x, real left, real right, 0, 480);
+    // y  = map(y, real bottom, real top, 320, 0);
+
+    // tft with yellow headers
+    //BtnX  = map(BtnX, 240, 0, 320, 0);
+    //BtnY  = map(BtnY, 379, 0, 240, 0);
+
+    // tht with black headers
+    BtnX  = map(BtnX, 0, 240, 320, 0);
+    BtnY  = map(BtnY, 0, 380, 240, 0);
+
+
+    Band1 = sBand1.slide(BtnX, BtnY);
+    Band2 = sBand2.slide(BtnX, BtnY);
+    Band3 = sBand3.slide(BtnX, BtnY);
+    Band4 = sBand4.slide(BtnX, BtnY);
+    Band5 = sBand5.slide(BtnX, BtnY);
+    Band6 = sBand6.slide(BtnX, BtnY);
+    Band7 = sBand7.slide(BtnX, BtnY);
+    Band8 = sBand8.slide(BtnX, BtnY);
+
+    if (sBand1.changed()) {
+      Display.fillRect(BAND1, 28, BAND2 - BAND1, 10, BACKCOLOR);
+      Display.setCursor(BAND1 , 30 ); Display.print(Band1);
+    }
+    if (sBand2.changed()) {
+      Display.fillRect(BAND2, 28, BAND3 - BAND2, 10, BACKCOLOR);
+      Display.setCursor(BAND2 , 30 ); Display.print(Band2);
+    }
+    if (sBand3.changed()) {
+      Display.fillRect(BAND3, 28, BAND4 - BAND3, 10, BACKCOLOR);
+      Display.setCursor(BAND3 , 30 ); Display.print(Band3);
+    }
+    if (sBand4.changed()) {
+      Display.fillRect(BAND4, 28, BAND5 - BAND4, 10, BACKCOLOR);
+      Display.setCursor(BAND4 , 30 ); Display.print(Band4);
+    }
+    if (sBand5.changed()) {
+      Display.fillRect(BAND5, 28, BAND6 - BAND5, 10, BACKCOLOR);
+      Display.setCursor(BAND5 , 30 ); Display.print(Band5);
+    }
+    if (sBand6.changed()) {
+      Display.fillRect(BAND6, 28, BAND7 - BAND6, 10, BACKCOLOR);
+      Display.setCursor(BAND6 , 30 ); Display.print(Band6);
+    }
+    if (sBand7.changed()) {
+      Display.fillRect(BAND7, 28, BAND8 - BAND7, 10, BACKCOLOR);
+      Display.setCursor(BAND7 , 30 ); Display.print(Band7);
+    }
+    if (sBand8.changed()) {
+      Display.fillRect(BAND8, 28, 320 - BAND8, 10, BACKCOLOR);
+      Display.setCursor(BAND8 , 30 ); Display.print(Band8);
+    }
+  }
+}
