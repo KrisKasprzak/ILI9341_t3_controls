@@ -20,6 +20,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 On a personal note, if you develop an application or product using this library
 and make millions of dollars, I'm happy for you!
+
+rev		date			author				change
+1.0		9/2019			kasprzak			initial code
+2.0		9/2020			kasprzak			added shapes and sizes for handles
+
+
 */
 
 
