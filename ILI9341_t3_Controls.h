@@ -40,11 +40,17 @@ and make millions of dollars, I'm happy for you!
 
 #include <ILI9341_t3.h>   
 
-#define BALL_DIA 10
 #define G_REPAINT 0
 #define G_DRAWOVER 1
 #define BELOW 0
 #define ABOVE 1
+
+#define HANDLE_NONE 0
+#define HANDLE_CIRCLE 1
+#define HANDLE_SQUARE 2
+#define HANDLE_TRIANGLE_1 3
+#define HANDLE_TRIANGLE_2 4
+#define HANDLE_TRIANGLE_3 5
 
 #define	C_BLACK   		0x0000
 #define	C_BLUE    		0x001F
@@ -104,6 +110,8 @@ public:
 	void showTitle(bool val);
 
 	void showScale(bool val);
+
+	
 
 
 private:
@@ -327,10 +335,16 @@ class SliderH {
 	float slide(float x, float y);			// method to move handle as user drags finger over handle, this method automatically looks for a valid range press
   
 	bool changed();
+
+	void change();
 	
 	void setColors(uint16_t sliderColor, uint16_t backColor, uint16_t handleColor);		// way to reset colors (useful for drawing enabled or disabled)
 
 	void setHandleColor(uint16_t handleColor);	// method to just draw the handle (useful for showing handle in green for OK value
+
+	void setHandleSize(int val);
+
+	void setHandleShape(byte val);
 
 	void drawSliderColor(bool val);
 
@@ -351,6 +365,8 @@ private:
 	float sc;				// the scale increment
 	float ce;				// the tick mark where zero is (for drawing heavy line on +/- scales
 	float i;				// loop counter
+	int handlesize;
+	byte handleshape;
 	bool ch;			 // flag if control was changed by user
 	bool colorscale;		// flag to draw slider in handle color
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh); // why Arduino has no mapping for floats is beyond me, here it is...
@@ -371,11 +387,17 @@ class SliderV {
 	float slide(uint16_t x, uint16_t y);	   // method to move handle as user drags finger over handle, this method automatically looks for a valid range press
     
 	bool changed(); 
+
+	void change();
 	
 	void setColors(uint16_t sliderColor, uint16_t backColor, uint16_t handleColor);	// way to reset colors (useful for drawing enabled or disabled)
 
 	void setHandleColor(uint16_t handleColor);		// method to just draw the handle (useful for showing handle in green for OK value
+
+	void setHandleSize(int val);
 	
+	void setHandleShape(byte val);
+
 	void drawSliderColor(bool val);
 
 private:
@@ -401,6 +423,8 @@ private:
 	bool colorscale;		// flag to draw slider in handle color
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh);// why Arduino has no mapping for floats is beyond me, here it is...
 	int tLen, tHi;
+	int handlesize;
+	byte handleshape;
 
   };
 

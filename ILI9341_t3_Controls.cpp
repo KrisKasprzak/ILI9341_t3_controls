@@ -767,7 +767,11 @@ void SliderV::init(float scaleLow, float scaleHi, float scale, float snap ) {
 	sc = 0.0;
 	sn = 0.0;
 	ch = true;
+	oy = -1;
 	colorscale = false;
+	handlesize = 10;
+	handleshape = HANDLE_CIRCLE;
+
 	// compute scale increments and snap increments
 	if (scale != 0) {
 		sc = (sh - sl) / scale;
@@ -813,32 +817,79 @@ remember the postion for painting over the original
 */
 void  SliderV::draw(float val) {
 	
-	d->fillCircle(l, oy, BALL_DIA, bColor);
+	if (!ch){
+		// no need to draw anything
+		return;
+	}
+
+
+	if (oy >= 0){
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(l, oy, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2), l - handlesize, oy+ (handlesize / 2),l , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2), l + handlesize, oy+ (handlesize / 2),l , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2), l - handlesize, oy+ (handlesize / 2),l , oy  , bColor);
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2), l + handlesize, oy+ (handlesize / 2),l , oy  , bColor);
+		}
+	}
+
 	pos = MapFloat(val, sl, sh, (float) t + (float) h, (float) t );
 	oy = pos;
 
 	if (colorscale){
-		d->fillRect(l - BALL_DIA / 4, t, BALL_DIA / 2, oy - t, sColor); // draw new slider
-		d->fillRect(l - BALL_DIA / 4, oy, BALL_DIA / 2, h - oy + t, hColor); // draw new slider
+		d->fillRect(l - 1 , t, 3, oy - t, sColor); // draw new slider
+		d->fillRect(l - 1 , oy, 3, h - oy + t, hColor); // draw new slider
 	}
 	else {
-		d->fillRect(l - (BALL_DIA/4), t, BALL_DIA / 2, h, sColor);
+		d->fillRect(l - 1, t, 3, h, sColor);
 	}
 	
 	if (sc != 0.0) {
 		for (i = 0; i <= sc; i++){
 
-			d->fillRect(l - 5,(i * (h / sc) ) + t, BALL_DIA + 1, 1, sColor);
+			d->fillRect(l - 3,(i * (h / sc) ) + t, 7, 1, sColor);
 
 			if ((i == ce) | (i == 0) | (i == sc)) {
-				d->fillRect(l - 5, (i * (h / sc)) + t, BALL_DIA + 1, 4, sColor);
+				d->fillRect(l - 3, (i * (h / sc)) + t, 7, 4, sColor);
 			}
 		}
 	}
 
-	d->fillCircle(l,pos,BALL_DIA,hColor);
-	d->drawCircle(l,pos,BALL_DIA,sColor);
-	d->drawCircle(l,pos,BALL_DIA-1,sColor);
+	if (handleshape == HANDLE_CIRCLE) {
+		d->fillCircle(l,pos,handlesize/2,hColor);
+		d->drawCircle(l,pos,handlesize/2,sColor);
+		d->drawCircle(l,pos,(handlesize/2)-1,sColor);
+	}
+	else if (handleshape == HANDLE_SQUARE) {
+		d->fillRect(l - (handlesize / 2), pos- (handlesize / 2), handlesize, handlesize, hColor);
+		d->drawRect(l - (handlesize / 2),pos- (handlesize / 2),handlesize, handlesize,sColor);
+		d->drawRect(l - (handlesize / 2) +1,pos- (handlesize / 2)+1,handlesize-2,handlesize-2,sColor);
+	}
+
+	else if (handleshape == HANDLE_TRIANGLE_1) {
+		d->fillTriangle(l - handlesize,	  pos- (handlesize / 2), l - handlesize,   pos+ (handlesize / 2),l ,  pos , hColor);
+		d->drawTriangle(l - handlesize,   pos- (handlesize / 2), l - handlesize,   pos+ (handlesize / 2),l ,  pos , sColor);
+	}
+	else if (handleshape == HANDLE_TRIANGLE_2) {
+		d->fillTriangle(l + handlesize,	  pos- (handlesize / 2), l + handlesize,   pos+ (handlesize / 2),l ,  pos , hColor);
+		d->drawTriangle(l + handlesize,   pos- (handlesize / 2), l + handlesize,   pos+ (handlesize / 2),l ,  pos , sColor);
+	}
+	else if (handleshape == HANDLE_TRIANGLE_3) {
+		d->fillTriangle(l - handlesize,	  pos- (handlesize / 2), l - handlesize,   pos+ (handlesize / 2),l ,  pos , hColor);
+		d->fillTriangle(l + handlesize,	  pos- (handlesize / 2), l + handlesize,   pos+ (handlesize / 2),l ,  pos , hColor);
+		d->drawTriangle(l - handlesize,   pos- (handlesize / 2), l - handlesize,   pos+ (handlesize / 2),l ,  pos , sColor);
+		d->drawTriangle(l + handlesize,   pos- (handlesize / 2), l + handlesize,   pos+ (handlesize / 2),l ,  pos , sColor);
+	}
+
 
 	oy = pos;
 	pos = val;
@@ -863,6 +914,7 @@ remember the postion for painting over the original
 
 float  SliderV::slide(uint16_t x, uint16_t y){
 	
+
 	ch = false;
 	if (sn != 0.0) {
 		y = y - t;
@@ -872,36 +924,74 @@ float  SliderV::slide(uint16_t x, uint16_t y){
 
 	if (y != oy){
 
-		if (abs(x - (l - BALL_DIA)) < BALL_DIA*2) {
+		if (abs(x - (l - handlesize)) < handlesize) {
 
 			if ((y >= t) & (y <= (t + h))) {
 				ch = true;
 				// it's in rage of ball
-				d->fillCircle(l, oy, BALL_DIA, bColor);  // blaok out ball
+				if (handleshape == HANDLE_CIRCLE) {
+					d->fillCircle(l, oy, handlesize/2, bColor);
+				}
+				else if (handleshape == HANDLE_SQUARE) {
+					d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_1) {
+					// weird i know but need to draw the black out slightly larger due to round off errors
+					d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_2) {
+					// weird i know but need to draw the black out slightly larger due to round off errors
+					d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_3) {
+					// weird i know but need to draw the black out slightly larger due to round off errors
+					d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+					d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+				}
 
 				if (colorscale){
-					d->fillRect(l - BALL_DIA / 4, t, BALL_DIA / 2, y - t, sColor); // draw new slider
-					d->fillRect(l - BALL_DIA / 4, y, BALL_DIA / 2,h- y + t , hColor); // draw new slider
+					d->fillRect(l - 1 , t, 3, oy - t, sColor); // draw new slider
+					d->fillRect(l - 1 , oy, 3, h - oy + t, hColor); // draw new slider
 				}
 				else {
-					d->fillRect(l - BALL_DIA / 4, t, BALL_DIA / 2, h, sColor); // draw new slider
+					d->fillRect(l - 1, t, 3, h, sColor);
 				}
-				
+	
 				if (sc != 0.0) {
 					for (i = 0; i <= sc; i++){
 
-						d->fillRect(l - 5, (i * (h / sc)) + t, BALL_DIA+1, 1, sColor);
+						d->fillRect(l - 3,(i * (h / sc) ) + t, 7, 1, sColor);
 
 						if ((i == ce) | (i == 0) | (i == sc)) {
-							d->fillRect(l - 5, (i * (h / sc)) + t, BALL_DIA+1, 4, sColor);
+							d->fillRect(l - 3, (i * (h / sc)) + t, 7, 4, sColor);
 						}
-
 					}
 				}
 
-				d->fillCircle(l, y, BALL_DIA, hColor);
-				d->drawCircle(l, y, BALL_DIA, sColor);
-				d->drawCircle(l, y, BALL_DIA - 1, sColor);
+				if (handleshape == HANDLE_CIRCLE) {
+					d->fillCircle(l,y,handlesize/2,hColor);
+					d->drawCircle(l,y,handlesize/2,sColor);
+					d->drawCircle(l,y,(handlesize/2)-1,sColor);
+				}
+				else if (handleshape == HANDLE_SQUARE) {
+					d->fillRect(l - (handlesize / 2), y- (handlesize / 2), handlesize, handlesize, hColor);
+					d->drawRect(l - (handlesize / 2),y- (handlesize / 2),handlesize, handlesize,sColor);
+					d->drawRect(l - (handlesize / 2) +1,y- (handlesize / 2)+1,handlesize-2,handlesize-2,sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_1) {
+					d->fillTriangle(l - handlesize,	  y- (handlesize / 2), l - handlesize, y+ (handlesize / 2) ,l ,  y , hColor);
+					d->drawTriangle(l - handlesize,   y- (handlesize / 2), l - handlesize, y+ (handlesize / 2) ,l ,  y , sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_2) {
+					d->fillTriangle(l + handlesize,	  y- (handlesize / 2), l + handlesize, y+ (handlesize / 2) ,l ,  y , hColor);
+					d->drawTriangle(l + handlesize,   y- (handlesize / 2), l + handlesize, y+ (handlesize / 2) ,l ,  y , sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_3) {
+					d->fillTriangle(l - handlesize,	  y- (handlesize / 2), l - handlesize, y+ (handlesize / 2) ,l ,  y , hColor);
+					d->fillTriangle(l + handlesize,	  y- (handlesize / 2), l + handlesize, y+ (handlesize / 2) ,l ,  y , hColor);
+					d->drawTriangle(l - handlesize,   y- (handlesize / 2), l - handlesize, y+ (handlesize / 2) ,l ,  y , sColor);
+					d->drawTriangle(l + handlesize,   y- (handlesize / 2), l + handlesize, y+ (handlesize / 2) ,l ,  y , sColor);
+				}
 				oy = y;
 
 				// get scaled val and pass back
@@ -938,12 +1028,46 @@ bool SliderV::changed(){
 
 }
 
+void SliderV::change(){
+
+	ch = true;
+
+}
+
 void SliderV::drawSliderColor(bool val){
 
 	colorscale = val;
 
 }
 
+
+void SliderV::setHandleSize(int val){
+
+	if (val < 4) {
+		handlesize = 4;
+	}
+	else if (val > 40) {
+		handlesize = 40;
+	}
+	else {
+		handlesize = val;
+	}
+
+}
+
+void SliderV::setHandleShape(byte val){
+
+	if (val < 0) {
+		handleshape = HANDLE_CIRCLE;
+	}
+	else if (val > 5) {
+		handleshape = HANDLE_CIRCLE;
+	}
+	else {
+		handleshape = val;
+	}
+
+}
 
 
 /*
@@ -980,7 +1104,11 @@ void SliderH::init(float scaleLow, float scaleHi, float scale, float snap ) {
 	sh = scaleHi;
 	sc = 0.0;
 	sn = 0.0;
+	ch = true;
+	ox = -1;
 	colorscale = false;
+	handlesize = 10;
+	handleshape = HANDLE_CIRCLE;
 
 	if (scale != 0) {
 		sc =  (sh - sl ) /  scale ;
@@ -1037,34 +1165,86 @@ remember the postion for painting over the original
 */
 void  SliderH::draw(float val) {
 	
-		d->fillCircle(ox, t, BALL_DIA, bColor);
+
+	if (!ch){
+		// no need to draw anything
+		return;
+	}
+
+	if (ox >= 0){
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(ox, t, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+	}
+
 		pos = MapFloat(val, sl, sh, (float) l, (float) l + (float) w);
 		ox = pos;
 		
 		if (colorscale){
-			d->fillRect(l, t, ox - l, BALL_DIA / 2, hColor);
-			d->fillRect(ox, t, w - ox + l, BALL_DIA / 2, sColor);
+			d->fillRect(l, t-1, ox-l, 3, hColor);
+			d->fillRect(ox, t-1, w - ox + l, 3, sColor);
 
 		}
 		else{
-			d->fillRect(l, t, w, BALL_DIA / 2, sColor);
+			d->fillRect(l, t-1, w+1, 3, sColor);
 		}
 
 		if (sc != 0.0) {
 			for (i = 0; i <= sc; i++){
 				
-				d->fillRect((i * (w / sc) ) + l, t-3, 1, BALL_DIA+1, sColor);
+				d->fillRect((i * (w / sc) ) + l, t-3, 1, 7, sColor);
 
 				if ((i == ce) | (i == 0) | (i == sc)) {
-					d->fillRect((i * (w / sc)) + l, t - 3, 4, BALL_DIA + 1, sColor);
+					d->fillRect((i * (w / sc)) + l-1, t - 3, 3, 7, sColor);
 				}
 			}
 		}
 		ch = false;
 		
-		d->fillCircle(pos, t, BALL_DIA,hColor);
-		d->drawCircle(pos, t, BALL_DIA,sColor);
-		d->drawCircle(pos, t, BALL_DIA - 1,sColor);
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(ox, t, handlesize/2, hColor);
+			d->drawCircle(ox, t, handlesize/2,sColor);
+			d->drawCircle(ox, t, (handlesize/2) - 1,sColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, hColor);
+			d->drawRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, sColor);
+			d->drawRect(ox- (handlesize / 2)+1, t - (handlesize / 2)+1, handlesize-2, handlesize-2, sColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, hColor);
+			d->drawTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, sColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, hColor);
+			d->drawTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, sColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, hColor);
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, hColor);
+
+			d->drawTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, sColor);
+			d->drawTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, sColor);
+
+		}
+
+
+
+
+
 
 		ox = pos;
 		pos = val;
@@ -1094,7 +1274,7 @@ float  SliderH::slide(float x,float y){
 	
 	ch = false;
 	if (sn != 0.0 ) {
- 		x = x + BALL_DIA;  
+ 		x = x + handlesize;  
 		x = x - l;
 		x =  (int) (x /  (w / sn));
 		x = (x *  (w / sn)) + l;
@@ -1104,34 +1284,78 @@ float  SliderH::slide(float x,float y){
 		
 		if ((x >= l) & (x <= (l + w))) {
 
-			if ((abs(y - t)) <= BALL_DIA) {
+			if ((abs(y - t)) <= handlesize) {
 
 				ch = true;
-				// it's in range of ball
-				d->fillCircle(ox, t, BALL_DIA, bColor);
+				if (handleshape == HANDLE_CIRCLE) {
+					d->fillCircle(ox, t, handlesize/2, bColor);
+				}
+				else if (handleshape == HANDLE_SQUARE) {
+					d->fillRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_1) {
+					d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_2) {
+					d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_3) {
+					d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+					d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+				}
 
 				if (colorscale){
-					d->fillRect(l, t, x-l, BALL_DIA / 2, hColor);
-					d->fillRect(x, t, w - x + l, BALL_DIA / 2, sColor);
-
+					d->fillRect(l, t-1, ox-l, 3, hColor);
+					d->fillRect(ox, t-1, w - ox + l, 3, sColor);
 				}
 				else{
-					d->fillRect(l, t, w, BALL_DIA / 2, sColor);
+					d->fillRect(l, t-1, w+1, 3, sColor);
 				}
-						
+			
 
 				if (sc != 0.0) {
 					for (i = 0; i <= sc; i++){
-						d->fillRect((i * (w / sc)) + l, t - 3, 1, BALL_DIA+1, sColor);
+				
+						d->fillRect((i * (w / sc) ) + l, t-3, 1, 7, sColor);
+
 						if ((i == ce) | (i == 0) | (i == sc)) {
-							d->fillRect((i * (w / sc)) + l, t - 3, 4, BALL_DIA+1, sColor);
+							d->fillRect((i * (w / sc)) + l-1, t - 3, 3, 7, sColor);
 						}
 					}
 				}
 
-				d->fillCircle(x, t, BALL_DIA, hColor);
-				d->drawCircle(x, t, BALL_DIA, sColor);
-				d->drawCircle(x, t, BALL_DIA - 1, sColor);
+			//	d->fillCircle(x, t, handlesize, hColor);
+			//	d->drawCircle(x, t, handlesize, sColor);
+			//	d->drawCircle(x, t, handlesize - 1, sColor);
+
+
+				if (handleshape == HANDLE_CIRCLE) {
+					d->fillCircle(x, t, handlesize/2, hColor);
+					d->drawCircle(x, t, handlesize/2,sColor);
+					d->drawCircle(x, t, (handlesize/2) - 1,sColor);
+				}
+				else if (handleshape == HANDLE_SQUARE) {
+					d->fillRect(x- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, hColor);
+					d->drawRect(x- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, sColor);
+					d->drawRect(x- (handlesize / 2)+1, t - (handlesize / 2)+1, handlesize-2, handlesize-2, sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_1) {
+					d->fillTriangle(x - (handlesize / 2), t - handlesize, x + (handlesize / 2), t - handlesize, x,t, hColor);
+					d->drawTriangle(x - (handlesize / 2), t - handlesize, x + (handlesize / 2), t - handlesize, x,t, sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_2) {
+					d->fillTriangle(x - (handlesize / 2), t + handlesize, x + (handlesize / 2), t + handlesize, x,t, hColor);
+					d->drawTriangle(x - (handlesize / 2), t + handlesize, x + (handlesize / 2), t + handlesize, x,t, sColor);
+				}
+				else if (handleshape == HANDLE_TRIANGLE_3) {
+					d->fillTriangle(x - (handlesize / 2), t - handlesize, x + (handlesize / 2), t - handlesize, x,t, hColor);
+					d->fillTriangle(x - (handlesize / 2), t + handlesize, x + (handlesize / 2), t + handlesize, x,t, hColor);
+
+					d->drawTriangle(x - (handlesize / 2), t - handlesize, x + (handlesize / 2), t - handlesize, x,t, sColor);
+					d->drawTriangle(x - (handlesize / 2), t + handlesize, x + (handlesize / 2), t + handlesize, x,t, sColor);
+
+				}
+				
 				ox = x;
 
 				// get scaled val and pass back
@@ -1150,11 +1374,46 @@ bool SliderH::changed(){
 	return ch;
 
 }
+
+void SliderH::change(){
+
+	ch = true;
+
+}
 void SliderH::drawSliderColor(bool val){
 
 	colorscale = val;
 
 }
+
+void SliderH::setHandleSize(int val){
+
+	if (val < 4) {
+		handlesize = 4;
+	}
+	else if (val > 40) {
+		handlesize = 40;
+	}
+	else {
+		handlesize = val;
+	}
+
+}
+
+void SliderH::setHandleShape(byte val){
+
+	if (val < 0) {
+		handleshape = HANDLE_CIRCLE;
+	}
+	else if (val > 5) {
+		handleshape = HANDLE_CIRCLE;
+	}
+	else {
+		handleshape = val;
+	}
+
+}
+
 /*
 
 class for a simpel slider-type on off switch, you pass in the coordinates for placement and colors, we'll pass in scale during initilization as scale may depend on some computed value
