@@ -107,6 +107,16 @@ void setup() {
   // turn the brightness up
   analogWrite(LCD_PIN, 255);
 
+// optional
+
+  sBand1.setHandleShape(HANDLE_NONE);
+  sBand2.setHandleShape(HANDLE_CIRCLE);
+  sBand3.setHandleShape(HANDLE_SQUARE);
+  sBand4.setHandleShape(HANDLE_TRIANGLE_1);
+  sBand5.setHandleShape(HANDLE_TRIANGLE_2);
+  sBand6.setHandleShape(HANDLE_TRIANGLE_3);
+
+
   // draw the slider controls
   sBand1.draw(Band1);
   sBand2.draw(Band2);
