@@ -375,9 +375,10 @@ int CGraph::add(const char *name, uint16_t color){
 	if (ID >= 10){
 		return -1;
 	}
-
+	pdia[ID] = 2;
 	strncpy(dl[ID], name, 20);
 	dc[ID] = color;
+	HaveFirstPoint[ID] = false;
 	ID++;	
 	return ID-1;
 
@@ -410,36 +411,47 @@ void CGraph::plot(int cID, float y){
 	}
 
 	if ((XPoint > gx) && (XPoint < gx + gw)) {
-		if (HaveFirstPoint){
-			d->drawLine(oXPoint, oYPoint[cID], XPoint, YPoint, dc[cID]);
+		if (HaveFirstPoint[cID]){
+			d->drawLine(oXPoint[cID], oYPoint[cID], XPoint, YPoint, dc[cID]);
+			if ( pdia[cID] > 0){
+				d->fillCircle(XPoint, YPoint, pdia[cID],  dc[cID]);
+				// d->fillRect(XPoint -  pdia[cID]/2, YPoint-  pdia[cID]/2, pdia[cID],   pdia[cID], dc[cID]);
+			}
 		}
 	}
 
-	HaveFirstPoint = true;
+	HaveFirstPoint[cID] = true;
 	oYPoint[cID] = YPoint;
-
-	oXPoint = XPoint;
+	oXPoint[cID] = XPoint;
 
 	// test to see if we need to redraw
 
 	if (XPoint + 2 > gx + gw) {
-
 		Delta = XHigh - (XLow);
 		XLow = XHigh;
 		XHigh = XHigh + Delta;
 		RedrawGraph = true;
+		HaveFirstPoint[cID] = false;
 	
 	}
  
 }
 
+void CGraph::setMarkerSize(int cID, byte val){
+
+	pdia[cID] = val;
+
+}
+
 void CGraph::drawGraph() {
 
 
-	HaveFirstPoint = false;
+	RedrawGraph = false;
 
 	float xDiv =  ((XHigh-XLow)/XInc);
 	float yDiv = ((YHigh-YLow)/YInc);
+
+
 
 	float ylen = gh /  yDiv;
 	float xlen = gw / xDiv;
@@ -459,10 +471,12 @@ void CGraph::drawGraph() {
 
 	d->setFont(af);
 
+	d->fillRect(gx, gy - gh-4, gw, gh+8, bc);
 	d->fillRect(gx, gy - gh, gw, gh, pc);
+
 	// draw vertical lines
 	for (j = 0; j <= xDiv; j++) {
-		d->drawFastVLine(gx + ((1+j) * xlen), gy - gh, gh, gc);
+		d->drawFastVLine(gx + ((0+j) * xlen), gy - gh, gh, gc);
 		if (xDiv < .1) {
 			XDec = 2;
 		}
@@ -483,7 +497,7 @@ void CGraph::drawGraph() {
 	// draw horizontal lines
 	for (i = 0; i <= yDiv; i++) {
 
-		d->drawFastHLine(gx, gy - (ylen * i), gw, gc);
+		d->drawFastHLine(gx, gy - (ylen * (0+i)), gw, gc);
 
 		if (YInc < .1) {
 			YDec = 2;
@@ -517,13 +531,7 @@ void CGraph::drawGraph() {
 	d->drawFastVLine(gx-2, gy - gh, gh+1, ac);
 
 
-	// draw x lable
-	if (sxs){
-		
-		d->setTextColor(tc, bc);
-		d->setCursor(gx,gy+ TextHeight+5);	
-		d->print(xa);
-	}
+
 
 	// draw legend
 	if (sl){
@@ -539,9 +547,12 @@ void CGraph::drawGraph() {
 			d->drawFastHLine(StartPointX+3, StartPointY+TextHeight/4 + 1, 20, dc[k]);
 			StartPointX += 30;
 		}
-	}
-	// draw y lable
-	if (sys){
+
+		// draw x lable
+		
+		d->setTextColor(tc, bc);
+		d->setCursor(gx,gy+ TextHeight+5);	
+		d->print(xa);
 		oOrientation = d->getRotation();
 		d->setTextColor(tc, bc);
 		d->setRotation(oOrientation - 1);
@@ -573,6 +584,7 @@ void CGraph::showXScale(bool val){
 void CGraph::showYScale(bool val){
 	sys = val;
 }
+
 
 
 

@@ -99,6 +99,9 @@ rev		date			author				change
 
 #define C_MDGREY      	0x7BCF
 
+#define CORNER_AUTO   -1
+#define CORNER_SQUARE  0
+
 class BarChartH {
 
 public:
@@ -227,6 +230,10 @@ public:
 
 	void showYScale(bool val);
 
+	void setMarkerSize(int ID, byte val);
+
+	void drawGraph();
+
 private:
 
 		ILI9341_t3			*d;
@@ -241,8 +248,8 @@ private:
 		float	XLow, XHigh, XInc;
 		float	YLow, YHigh, YInc;
 		bool RedrawGraph = true;
-		bool HaveFirstPoint = false;
-		float		XPoint, YPoint, oXPoint, oYPoint[10], TextHeight;
+		bool HaveFirstPoint[10];
+		float		XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
 		float		XDec = 0.0, YDec = 0.0;
 		char	text[30];
 		byte	oOrientation = 0;
@@ -259,8 +266,8 @@ private:
 		uint16_t gc;
 		uint16_t bc;
 		uint16_t pc;
-	
-		void drawGraph();
+		byte pdia[20];
+
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 
@@ -462,5 +469,200 @@ private:
 	bool _pos;				// the screen coordinate position
 	bool _changed;			//flag to track if button was just changed
   };
+
+
+
+/*
+
+Button class inspired by Adafruit, but added several methods
+
+*/
+
+class Button {
+public:
+	Button(void) { _d = NULL; }
+	void init(ILI9341_t3 *Display, int16_t x, int16_t y,
+		uint8_t w, uint8_t h,
+		uint16_t outline, uint16_t fill, uint16_t textcolor, uint16_t backcolor, uint16_t dcolort,uint16_t dcolorb,
+		const char *label, uint8_t x_offset, uint8_t y_offset, const ILI9341_t3_font_t &f ) {
+
+		_x = x;
+		_y = y;
+		_w = w;
+		_h = h;
+		_outlinecolor = outline;
+		_fillcolor = fill;
+		_textcolor = textcolor;
+		_backcolor = backcolor;
+		_disablecolorfill = dcolorb;
+		_disablecolortext = dcolort;
+		_x_offset = x_offset;
+		_y_offset = y_offset;
+		_d = Display;
+		strncpy(_label, label, 20);
+		_f = f;
+		_ct = CORNER_AUTO;
+		_enable = true;
+		value = 0; // user controlled for whatever....
+
+	}
+	void draw(bool inverted = false) {
+		uint16_t fill, outline, text;
+
+		if (! inverted) {
+			fill = _fillcolor;
+			outline = _outlinecolor;
+			text = _textcolor;
+		} else {
+			fill =  _textcolor;
+			outline = _outlinecolor;
+			text = _fillcolor;
+		}
+
+		if(!_enable) {
+
+			if (_ct == CORNER_AUTO){
+				_d->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, _disablecolorfill);
+				_d->drawRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, _disablecolortext);
+			}
+			else if(_ct == CORNER_SQUARE) {
+				_d->fillRect(_x - (_w/2), _y - (_h/2), _w, _h, _disablecolorfill);
+				_d->drawRect(_x - (_w/2), _y - (_h/2), _w, _h, _disablecolortext);
+			}
+			else {
+				_d->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, _ct, _disablecolorfill);
+				_d->drawRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, _ct, _disablecolortext);
+			}
+			
+			_d->setCursor(_x - strlen(_label)*3*_x_offset, _y-4*_y_offset);
+			_d->setFont(_f);
+			_d->setTextColor(_disablecolortext);
+			_d->print(_label);
+		}
+		else{
+			if (_ct == CORNER_AUTO){
+				_d->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, fill);
+				_d->drawRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, outline);
+			}
+			else if(_ct == CORNER_SQUARE) {
+				_d->fillRect(_x - (_w/2), _y - (_h/2), _w, _h, fill);
+				_d->drawRect(_x - (_w/2), _y - (_h/2), _w, _h, outline);
+			}
+			else {
+				_d->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, _ct, fill);
+				_d->drawRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, _ct, outline);
+			}
+			_d->setCursor(_x - strlen(_label)*3*_x_offset, _y-4*_y_offset);
+			_d->setFont(_f);
+			_d->setTextColor(text);
+			_d->print(_label);
+		}
+		
+	}
+
+	void show() {
+		_enable = true;
+		draw();
+	}
+
+
+	void hide() {
+		_d->fillRoundRect(_x - (_w/2), _y - (_h/2), _w, _h, min(_w,_h)/4, _backcolor);
+		_enable = false;
+	}
+
+	void resize(int16_t x, int16_t y, uint8_t w, uint8_t h) {
+		hide();
+		_x = x;
+		_y = y;
+		_w = w;
+		_h = h;
+		_enable = true;
+		draw();
+		
+	}
+
+	void setColors(uint16_t outline, uint16_t fill, uint16_t textcolor, uint16_t backcolor, uint16_t dcolort,uint16_t dcolorb) {
+		
+		_outlinecolor = outline;
+		_fillcolor = fill;
+		_textcolor = textcolor;
+		_backcolor = backcolor;
+		_disablecolorfill = dcolorb;
+		_disablecolortext = dcolort;
+		draw();
+		
+	}
+
+	void setFont(uint8_t x_offset, uint8_t y_offset, const ILI9341_t3_font_t &f) {
+		_x_offset = x_offset;
+		_y_offset = y_offset;
+		_f = f;
+		draw();
+		
+	}
+
+	void setText(const char *label) {
+		strncpy(_label, label, 20);
+		draw();
+	}
+
+	void setCornerRadius(int val) {
+		_ct = val;
+		_d->fillRect(_x - (_w/2), _y - (_h/2), _w, _h, _backcolor);
+		draw();
+	}
+
+	bool contains(int16_t x, int16_t y) {
+		if (!_enable) {
+			return false;
+		}
+
+		if ((x < (_x - _w/2)) || (x > (_x + _w/2))) return false;
+		if ((y < (_y - _h/2)) || (y > (_y + _h/2))) return false;
+
+		return true;
+	}
+
+	void press(boolean p) {
+		laststate = currstate;
+		currstate = p;
+	}
+	bool isPressed() { return currstate; }
+
+
+	void disable() { 
+		_enable = false;
+		draw();
+	}
+	void enable() { 
+		_enable = true;
+		draw();
+	}
+
+	bool enabled() { 
+		return _enable;
+	}
+
+
+	int value;
+
+private:
+	ILI9341_t3 *_d;
+	ILI9341_t3_font_t _f;
+	int16_t _x, _y;
+	uint16_t _w, _h;
+	uint8_t _x_offset, _y_offset;
+	uint16_t _outlinecolor, _fillcolor, _textcolor, _backcolor, _disablecolorfill, _disablecolortext;
+	char _label[20];
+	boolean currstate, laststate;
+	bool _enable;
+	int _ct;
+};
+
+
+
+
+
 
 #endif
