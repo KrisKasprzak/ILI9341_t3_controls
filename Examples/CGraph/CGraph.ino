@@ -71,7 +71,7 @@ void setup() {
   SinID = MyGraph.add("sin(x)", SINCOLOR);
 
   // these call are all optional
-  MyGraph.drawGraph();		// draw empty graph if you have a long delay before any plottable data
+  MyGraph.drawGraph();		// draw empty graph
   MyGraph.setMarkerSize(VoltID, 0); 
   MyGraph.setMarkerSize(SinID, 1);
   // MyGraph.setYAxis(-1.5, 2.5, 0.5);  // reset the y axis at any time in your program
