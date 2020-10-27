@@ -24,7 +24,7 @@ and make millions of dollars, I'm happy for you!
 rev		date			author				change
 1.0		9/2019			kasprzak			initial code
 2.0		9/2020			kasprzak			added shapes and sizes for handles
-
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
 
 */
 
