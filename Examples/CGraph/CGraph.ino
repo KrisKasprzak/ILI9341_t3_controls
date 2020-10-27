@@ -6,10 +6,12 @@
 #define FONT_TITLE Arial_16
 #define FONT_DATA Arial_10
 
-// defines for my pins
-#define TFT_CS      10
-#define TFT_DC      9
-#define LED_PIN     A9
+// For the Adafruit shield, these are the default.
+#define TFT_DC  9
+#define TFT_CS 10
+
+// Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
+ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
 
 // defines for graph location and scales
 #define X_ORIGIN    50
@@ -51,11 +53,7 @@ CGraph MyGraph(&Display, X_ORIGIN, Y_ORIGIN, X_WIDE, Y_HIGH, X_LOSCALE, X_HISCAL
 
 void setup() {
 
-  Serial.begin(9600);
-
-  // I generally connect a digial pin to my LED pin to control brightness
-  // connect LED to 3V3 if you want it on all the time
-  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(57600);
 
   // fire up the display
   Display.begin();
@@ -68,15 +66,14 @@ void setup() {
 
   // use the add method to create a plot for each data
   // PlotID = MyGraph.Add(data title, data color);
+  // 
   VoltID = MyGraph.add("Volts", VOLTSCOLOR);
-  SinID = MyGraph.add("Sin", SINCOLOR);
-  CosID = MyGraph.add("Cos", COSCOLOR);
-
-  // i have a pin connected to my LCD's LER pin so I can control the brightness via code
-  analogWrite(LED_PIN, 255);
+  SinID = MyGraph.add("sin(x)", SINCOLOR);
 
   // these call are all optional
-  // MyGraph.plot(0, 0);		// draw empty graph if you have a long delay before any plottable data
+  MyGraph.drawGraph();		// draw empty graph if you have a long delay before any plottable data
+  MyGraph.setMarkerSize(VoltID, 0); 
+  MyGraph.setMarkerSize(SinID, 1);
   // MyGraph.setYAxis(-1.5, 2.5, 0.5);  // reset the y axis at any time in your program
   // MyGraph.showTitle(false);          //  hide the title--good for big graph in tight space
   // MyGraph.showLegend(false);         //  hide the legend--good for big graph in tight space
@@ -87,26 +84,18 @@ void setup() {
 
 void loop() {
 
-  // you will need to do your own math for getting the update speed to match the x axis update
-  if ((millis() - oldTime) >= 10) {
+  // set the x value, should be in order and match the x scale (again you will
+  // need to do your own math to get the plot to match the updte time in this loop
 
-    oldTime = millis();
+  volts = analogRead(A0) / 1024.0;
+  MyGraph.setX(x);
 
-    // get your data
-    volts = analogRead(A4) * 3.3 / 1024;
+  MyGraph.plot(VoltID, volts);
+  MyGraph.plot(SinID, sin(x));
 
-    // set the x value, should be in order and match the x scale (again you will
-    // need to do your own math to get the plot to match the updte time in this loop
-    MyGraph.setX(x);
 
-    // now plot your data points
-    // graphObject.plot(PLOT_ID from above, data point);
-    MyGraph.plot(VoltID, volts);
-    MyGraph.plot(SinID, sin(x));
-    MyGraph.plot(CosID, cos(x));
-
-    // bump the x value
-    x += 0.01;
-  }
+  // bump the x value
+  x += .01;
+  delay(10);
 
 }
