@@ -1,3 +1,5 @@
+<b><h2><center>Version 4.0 updated 11/15/2020</center></h1></b>
+
 <b><h2><center>Slider Controls for Touchscreen Displays</center></h1></b>
 
 This library will let programmers add graphkical objects such as 1) horizontal bar chart 2) vertical bar chart 3) cartesian graph 4) dial and 5) slider controlss to their projects. This library is intended to be used with ILI9341_t3 libraries and TFT LCD's that support touch. Typical applications are graphing temperatures, voltages, etc. as wel as providing UI controls for adjusting volume, brightness and on/off capability. Multiple controls can be added allow the UI creation par charts that report pin reads and sliders to adjust output levesl. Most of these objects support multiple ceation, location control, color control as other options. 
