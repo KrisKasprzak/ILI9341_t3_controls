@@ -1,4 +1,4 @@
-<b><h2><center>Version 4.0 updated 11/15/2020</center></h1></b>
+<b><h2><center>Version 5.0 updated 11/19/2020</center></h1></b>
 
 <b><h2><center>Slider Controls for Touchscreen Displays</center></h1></b>
 
