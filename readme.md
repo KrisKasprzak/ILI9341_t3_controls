@@ -24,9 +24,10 @@ This library also has controls for 1) buttons 2) check boxes and 3) option butto
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Button.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Checkbox.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/OptionButton.jpg)
-![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/MultiSceen.jpg)
+<br>
 <br>
 I have included a bonus example that shows how to create multi-screen interface
- 
+<br>
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/MultiSceen.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Eq.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/EQSettings.jpg)
