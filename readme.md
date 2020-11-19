@@ -25,5 +25,5 @@ This library also has controls for 1) buttons 2) check boxes 3) option buttons a
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Checkbox.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/OptionButton.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/MultiSceen.jpg)
-![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/eq.jpg)
-![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/eqsettings.jpg)
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/EQ.jpg)
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/EQSettings.jpg)
