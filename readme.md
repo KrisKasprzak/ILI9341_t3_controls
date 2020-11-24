@@ -35,7 +35,7 @@ I have included a bonus example that shows how to create multi-screen interface
 <br>
 <br>
 <b><h2><center>Revision history</center></h1></b>
-rev		
+<br>
 1.0		initial code<br>
 2.0		added shapes and sizes for handles<br>
 3.0		fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods<br>
