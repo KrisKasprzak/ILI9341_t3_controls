@@ -27,7 +27,7 @@
 	3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
 	4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
 	5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-	5.1		11/2020			kasprzak			fixed bug in draw code in sliderH and SliderV to automatically blank out previous handles (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+	5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 */
 
 
