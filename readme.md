@@ -36,9 +36,9 @@ I have included a bonus example that shows how to create multi-screen interface
 <br>
 <b><h2><center>Revision history</center></h1></b>
 rev		date			author				change
-1.0		9/2019			kasprzak			initial code
-2.0		9/2020			kasprzak			added shapes and sizes for handles
-3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-5.1		11/2020			kasprzak			fixed bug in draw code in sliderH and SliderV to automatically blank out previous handles (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+1.0		9/2019			kasprzak			initial code<br>
+2.0		9/2020			kasprzak			added shapes and sizes for handles<br>
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods<br>
+4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes<br>
+5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property<br>
+5.1		11/2020			kasprzak			fixed bug in draw code in sliderH and SliderV to automatically blank out previous handles (really needed when a slide is redrawn based on input other than a finger slide (encoder)<br>
