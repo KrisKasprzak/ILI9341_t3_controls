@@ -41,4 +41,4 @@ rev
 3.0		fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods<br>
 4.0		fixed bugs added Button, Checkbox, OptionButton classes<br>
 5.0		modified sliders, option and check to return true/false if pressed, and actual value stored in value property<br>
-5.1		fixed bug in draw method in sliderH and SliderV controls to automatically blank out previous handles (really needed when a slide is redrawn based on input other than a finger slide (encoder)<br>
+5.1		added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)<br>
