@@ -1,4 +1,4 @@
-<b><h2><center>Version 5.0 updated 11/19/2020</center></h1></b>
+<b><h2><center>Version 5.1 updated 11/24/2020</center></h1></b>
 
 <b><h2><center>Slider Controls for Touchscreen Displays</center></h1></b>
 
@@ -31,3 +31,14 @@ I have included a bonus example that shows how to create multi-screen interface
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/MultiSceen.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Eq.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/EQSettings.jpg)
+
+<br>
+<br>
+<b><h2><center>Revision history</center></h1></b>
+rev		date			author				change
+1.0		9/2019			kasprzak			initial code
+2.0		9/2020			kasprzak			added shapes and sizes for handles
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
+5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1		11/2020			kasprzak			fixed bug in draw code in sliderH and SliderV to automatically blank out previous handles (really needed when a slide is redrawn based on input other than a finger slide (encoder)
