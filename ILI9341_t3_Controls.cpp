@@ -864,32 +864,32 @@ void  SliderV::draw(float val) {
 
 	pos = MapFloat(value, (float) sl, (float)sh, (float)(t + h), (float)t );
 
-	// blannk ouut any previous--note draw can be called w/o slide in cases where sliders are tied together
+	// blank ouut any previous--note: draw can be called w/o slide() in cases where sliders are tied together or slider tide to a mechanical device
 	
-	Serial.println(pos);
-	Serial.println(oy);
+	// Serial.println(pos);
+	// Serial.println(oy);
 
 	if ((pos != oy) && (oy >= 0)) {
-				// blank out the old one
-			if (handleshape == HANDLE_CIRCLE) {
-				d->fillCircle(l, oy, handlesize/2, bColor);
-			}
-			else if (handleshape == HANDLE_SQUARE) {
-				d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
-			}
-			else if (handleshape == HANDLE_TRIANGLE_1) {
-				// weird i know but need to draw the black out slightly larger due to round off errors
-				d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
-			}
-			else if (handleshape == HANDLE_TRIANGLE_2) {
-				// weird i know but need to draw the black out slightly larger due to round off errors
-				d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
-			}
-			else if (handleshape == HANDLE_TRIANGLE_3) {
-				// weird i know but need to draw the black out slightly larger due to round off errors
-				d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
-				d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
-			}
+		// blank out the old one
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(l, oy, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
 				
 	}
 
@@ -1327,15 +1327,11 @@ void  SliderH::draw(float val) {
 		ssColor = dsColor;
 	}
 
-
-
-
-	////////////////////////
-
 	// draw the slider
 	pos = MapFloat(value, (float) sl, (float)sh, (float) l, (float)(w+l) );
 	//////////////////////////
 	// seems odd to blank out old but of draw is called in .ino, need to clean up old stuff
+	// or draw may be called in cases where a mechanical device is used to move the slider
 	if ((ox != pos) && (ox > 0)){
 		if (handleshape == HANDLE_CIRCLE) {
 			d->fillCircle(ox, t, handlesize/2, bColor);
@@ -1354,8 +1350,6 @@ void  SliderH::draw(float val) {
 			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
 		}
 	}
-
-
 
 	if (colorscale){
 		d->fillRect(l, t-1, abs(pos-l), 3, thColor);
@@ -1594,7 +1588,7 @@ void SliderH::setPressDebounce(byte Debounce) {
 
 /*
 
-class for a simpel slider-type on off switch, you pass in the coordinates for placement and colors, we'll pass in scale during initilization as scale may depend on some computed value
+class for a simple slider-type on off switch, you pass in the coordinates for placement and colors, we'll pass in scale during initilization as scale may depend on some computed value
 
 */
 SliderOnOff::SliderOnOff(ILI9341_t3 *display, uint16_t SliderX, uint16_t SliderY, uint16_t SliderW, uint16_t SliderH, uint16_t SliderColor, uint16_t BackColor, uint16_t OnColor, uint16_t OffColor)
@@ -1615,17 +1609,7 @@ SliderOnOff::SliderOnOff(ILI9341_t3 *display, uint16_t SliderX, uint16_t SliderY
 
 /*
 
-method to more the on/off slider
-
-see if the screen press is in the controls range
-optionally get the snap increment
-draw the scale
-draw optional tick marks
-get the actual scaled value and map to the appropriate screen position
-draw the handle in the scaled location
-reset the position for redraw method
-remember the postion for painting over the original
-
+method to move the on/off slider
 
 */
 
