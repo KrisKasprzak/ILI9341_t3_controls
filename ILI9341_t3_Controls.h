@@ -845,6 +845,9 @@ public:
 
 	bool press(int16_t SceenX, int16_t ScreenY) {
 		bool pressed = false;
+		
+		ScreenX = ScreenX - s;
+		
 		if ((!visible) || (!enabled)) {
 			return pressed;
 		}
@@ -1055,6 +1058,9 @@ public:
 
 	bool press(uint16_t ScreenX, uint16_t ScreenY) {
 		bool pressed = false;
+		
+		ScreenX = ScreenX - 2*r;
+		
 		if ((!visible) || (!enabled)) {
 			return pressed;
 		}
