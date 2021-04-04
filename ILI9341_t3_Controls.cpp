@@ -1447,7 +1447,7 @@ bool  SliderH::slide(float ScreenX,float ScreenY){
 
 	
 	if (sn != 0.0 ) {
- 		x = x + handlesize;  
+ 		x = x - handlesize;  
 		x = x - l;
 		x =  (x /  (w / sn));
 		x = (x *  (w / sn)) + l;
