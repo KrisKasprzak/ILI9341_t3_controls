@@ -1,4 +1,7 @@
-<b><h2><center>Version 5.1 updated 11/24/2020</center></h1></b>
+<b><h2><center>Version 5.2 updated 4/5/2021</center></h1></b>
+1. added changed() back to sliderH and SliderV classes
+2. improved touch / control location accuracy
+3. fixed var name typo
 
 <b><h2><center>Slider Controls for Touchscreen Displays</center></h1></b>
 
