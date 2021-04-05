@@ -21,14 +21,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 On a personal note, if you develop an application or product using this library
 and make millions of dollars, I'm happy for you!
 
-rev		date			author				change
-1.0		9/2019			kasprzak			initial code
-2.0		9/2020			kasprzak			added shapes and sizes for handles
-3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-
+rev	date	author		change
+1.0	9/2019	kasprzak	initial code
+2.0	9/2020	kasprzak	added shapes and sizes for handles
+3.0	10/2020	kasprzak	fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0	11/2020	kasprzak	fixed bugs added Button, Checkbox, OptionButton classes
+5.0	11/2020	kasprzak	modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1	4/2021	kasprzak	added changed() back into sliderH and SliderV improved touch/control accuracy
 */
 
 
@@ -382,6 +381,8 @@ class SliderH {
 	void show();
 
 	void hide();
+	
+	bool changed();
 
 	void setHandleShape(byte shape);
 
@@ -422,6 +423,7 @@ private:
 	bool colorscale;		// flag to draw slider in handle color
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh); // why Arduino has no mapping for floats is beyond me, here it is...
 	byte debounce;
+	bool pressed = false;
 	
   };
 
@@ -456,6 +458,8 @@ class SliderV {
 	void enable();
 
 	void show();
+	
+	bool changed();
 
 	void hide();
 
@@ -496,6 +500,7 @@ private:
 	bool enabled;
 	bool visible;
 	byte debounce;
+	bool pressed = false;
   };
 
 class SliderOnOff {
@@ -843,16 +848,14 @@ public:
 		d->print(label);
 	}
 
-	bool press(int16_t SceenX, int16_t ScreenY) {
+	bool press(int16_t ScreenX, int16_t ScreenY) {
 		bool pressed = false;
-		
-		ScreenX = ScreenX - s;
 		
 		if ((!visible) || (!enabled)) {
 			return pressed;
 		}
 
-		if (   ( (SceenX >= x) && (SceenX <= (x + s) )) && ((ScreenY >= y-s) && (ScreenY <= (y)))   ) {	
+		if (   ( (ScreenX >= x) && (ScreenX <= (x + s) )) && ((ScreenY >= y-s) && (ScreenY <= (y)))   ) {	
 			state = !state;
 			draw(state);
 			delay(debounce);
