@@ -21,13 +21,14 @@
   On a personal note, if you develop an application or product using this library 
   and make millions of dollars, I'm happy for you!
 
-	rev		date			author				change
-	1.0		9/2019			kasprzak			initial code
-	2.0		9/2020			kasprzak			added shapes and sizes for handles
-	3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-	4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-	5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-	5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+	rev	date	author			change
+	1.0	9/2019	kasprzak		initial code
+	2.0	9/2020	kasprzak		added shapes and sizes for handles
+	3.0	10/2020	kasprzak		fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+	4.0	11/2020	kasprzak		fixed bugs added Button, Checkbox, OptionButton classes
+	5.0	11/2020	kasprzak		modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+	5.1	11/2020	kasprzak		added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+	5.2	4/2021	kasprzak		added changed back to SliderV and SliderH, improved touch / control location
 */
 
 
@@ -965,7 +966,7 @@ remember the postion for painting over the original
 
 bool SliderV::slide(uint16_t ScreenX, uint16_t ScreenY){
 	
-	bool pressed = false;
+	pressed = false;
 
 	x = ScreenX;
 	y = ScreenY;
@@ -983,7 +984,7 @@ bool SliderV::slide(uint16_t ScreenX, uint16_t ScreenY){
 
 	if (y != oy){
 		
-		if (abs(x -l ) <= handlesize) {
+		if (abs(x -l) <= handlesize) {
 			
 			if ((y >= t) & (y <= (t + h))) {
 				pressed = true;
@@ -1069,6 +1070,17 @@ bool SliderV::slide(uint16_t ScreenX, uint16_t ScreenY){
 	}
 	//return pos;
 	return pressed;
+}
+
+/*
+
+method to set hust the handle color, this is useful for drawing handle in warning color
+
+*/
+bool  SliderV::changed() {
+
+	return pressed;
+
 }
 
 
@@ -1425,9 +1437,9 @@ remember the postion for painting over the original
 
 bool  SliderH::slide(float ScreenX,float ScreenY){
 
-	bool pressed = false;
+	pressed = false;
 
-	x = ScreenX;
+	x = ScreenX ;
 	y = ScreenY;
 
 	if (!enabled) {
@@ -1447,13 +1459,13 @@ bool  SliderH::slide(float ScreenX,float ScreenY){
 
 	
 	if (sn != 0.0 ) {
- 		x = x - handlesize;  
+ 		x = x ;  
 		x = x - l;
 		x =  (x /  (w / sn));
 		x = (x *  (w / sn)) + l;
 	}
 	else {
-		x = x + handlesize; 
+		x = x; 
 	}
 
 	// draw ball and scale
@@ -1550,6 +1562,11 @@ void SliderH::drawSliderColor(bool color){
 
 }
 
+bool SliderH::changed(){
+
+	return  pressed;
+
+}
 
 
 void SliderH::setHandleSize(int size){
