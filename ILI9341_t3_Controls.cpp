@@ -29,6 +29,7 @@
 	5.0	11/2020	kasprzak		modified sliders, option and check to return true/false if pressed, and actual value stored in value property
 	5.1	11/2020	kasprzak		added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 	5.2	4/2021	kasprzak		added changed back to SliderV and SliderH, improved touch / control location
+	5.3	4/2021	kasprzak		added redraw code to the change handle size and shape, that way the old gets painted out upon a change (after init());
 */
 
 
