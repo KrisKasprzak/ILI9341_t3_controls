@@ -29,8 +29,8 @@
 	4.0	11/2020	kasprzak	fixed bugs added Button, Checkbox, OptionButton classes
 	5.0	11/2020	kasprzak	modified sliders, option and check to return true/false if pressed, and actual value stored in value property
 	5.1	4/2021	kasprzak	added changed() back into sliderH and SliderV improved touch/control accuracy
-
-	5.3	4/2021	kasprzak		added redraw code to the change handle size and shape, that way the old gets painted out upon a change (after init());
+	5.2	4/2021	kasprzak		added changed back to SliderV and SliderH, improved touch / control location
+	5.3	4/2021	kasprzak		added redraw code to the change handle size and shape, that way the old gets painted out upon a change (after init())
 */
 
 
@@ -427,6 +427,7 @@ private:
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh); // why Arduino has no mapping for floats is beyond me, here it is...
 	byte debounce;
 	bool pressed = false;
+	bool SliderIsDrawn = false;
 	
   };
 
@@ -504,6 +505,7 @@ private:
 	bool visible;
 	byte debounce;
 	bool pressed = false;
+	bool SliderIsDrawn = false;
   };
 
 class SliderOnOff {
