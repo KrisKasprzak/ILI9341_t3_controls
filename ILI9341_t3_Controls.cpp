@@ -913,7 +913,7 @@ void  SliderV::draw(float val) {
 		}
 	}
 
-
+	SliderIsDrawn = true;
 
 
 	if (handleshape == HANDLE_CIRCLE) {
@@ -1151,21 +1151,73 @@ void  SliderV::hide() {
 	
 }
 
-void SliderV::setHandleSize(int value){
+void SliderV::setHandleSize(int size){
+	
+	if (SliderIsDrawn){
+			// blank out the old one
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(l, oy, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
+	}	
+	
 
-	if (value < 4) {
+	if (size < 4) {
 		handlesize = 4;
 	}
-	else if (value > 40) {
+	else if (size > 40) {
 		handlesize = 40;
 	}
 	else {
-		handlesize = value;
+		handlesize = size;
 	}
-
+	// if slider has been drawn, paint out old handle redraw slider
+	if (SliderIsDrawn){
+		draw(value);
+	}
+	
 }
 
 void SliderV::setHandleShape(byte value){
+	
+	
+	if (SliderIsDrawn){
+			// blank out the old one
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(l, oy, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(l - (handlesize / 2), oy- (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			// weird i know but need to draw the black out slightly larger due to round off errors
+			d->fillTriangle(l - handlesize, oy- (handlesize / 2)-1, l - handlesize, oy+ (handlesize / 2)+1,l+1 , oy  , bColor);
+			d->fillTriangle(l + handlesize, oy- (handlesize / 2)-1, l + handlesize, oy+ (handlesize / 2)+1,l-1 , oy  , bColor);
+		}
+	}		
 
 	if (value < 0) {
 		handleshape = HANDLE_CIRCLE;
@@ -1176,7 +1228,12 @@ void SliderV::setHandleShape(byte value){
 	else {
 		handleshape = value;
 	}
-
+	
+	// if slider has been drawn, paint out old handle redraw slider
+	if (SliderIsDrawn){
+		draw(value);
+	}
+	
 }
 void SliderV::setPressDebounce(byte Debounce) { 
 	debounce = Debounce;
@@ -1383,6 +1440,7 @@ void  SliderH::draw(float val) {
 		}
 	}
 	
+	SliderIsDrawn = true;
 	
 	// draw new handle
 	if (handleshape == HANDLE_CIRCLE) {
@@ -1570,6 +1628,25 @@ bool SliderH::changed(){
 
 
 void SliderH::setHandleSize(int size){
+	
+	if (SliderIsDrawn){
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(ox, t, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+	}
 
 	if (size < 4) {
 		handlesize = 4;
@@ -1580,10 +1657,35 @@ void SliderH::setHandleSize(int size){
 	else {
 		handlesize = size;
 	}
+	
+	
+	if (SliderIsDrawn){
+		draw(value);	
+	}
+	
 
 }
 
 void SliderH::setHandleShape(byte shape){
+	
+	if (SliderIsDrawn){
+		if (handleshape == HANDLE_CIRCLE) {
+			d->fillCircle(ox, t, handlesize/2, bColor);
+		}
+		else if (handleshape == HANDLE_SQUARE) {
+			d->fillRect(ox- (handlesize / 2), t - (handlesize / 2), handlesize, handlesize, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_1) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_2) {
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+		else if (handleshape == HANDLE_TRIANGLE_3) {
+			d->fillTriangle(ox - (handlesize / 2), t - handlesize, ox + (handlesize / 2), t - handlesize, ox,t, bColor);
+			d->fillTriangle(ox - (handlesize / 2), t + handlesize, ox + (handlesize / 2), t + handlesize, ox,t, bColor);
+		}
+	}
 
 	if (shape < 0) {
 		handleshape = HANDLE_CIRCLE;
@@ -1594,6 +1696,11 @@ void SliderH::setHandleShape(byte shape){
 	else {
 		handleshape = shape;
 	}
+	
+	if (SliderIsDrawn){
+		draw(value);	
+	}
+	
 
 }
 
