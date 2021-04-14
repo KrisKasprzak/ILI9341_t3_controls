@@ -406,8 +406,8 @@ private:
 	uint16_t tsColor;
 	uint16_t ssColor;
 	uint16_t thColor;
-	float x;
-	float y;
+	uint16_t x;
+	uint16_t y;
 	uint16_t l;			// the left coordinate of the scale
 	uint16_t t;			// the top coordinate of the scale
 	uint16_t w;			// the width of the scale
