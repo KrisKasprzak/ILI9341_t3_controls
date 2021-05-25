@@ -31,6 +31,7 @@
 	5.2	4/2021	kasprzak		added changed back to SliderV and SliderH, improved touch / control location
 	5.3	4/2021	kasprzak		added redraw code to the change handle size and shape, that way the old gets painted out upon a change (after init());
 	5.31	4/2021	kasprzak		fixed snap issue in horizontal slider and draw issue with double triangle in horizontal slider
+*/
 
 
 #include "ILI9341_t3_Controls.h"
