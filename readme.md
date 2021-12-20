@@ -1,3 +1,7 @@
+<b><h2><center>Version 5.4 updated 12/20/2021</center></h1></b>
+1. Added a ring slider
+
+
 <b><h2><center>Version 5.31	updated 4/7/2021</center></h1></b>
 1. Fixed snap issue in horizontal slider and draw issue with double triangle in horizontal slider
 
@@ -19,7 +23,7 @@ While this library was created for the ILI9341_t3 and intended for Teensy-based 
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Dial.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/ColorPicker.jpg)
-
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/RingSlider.jpg)
 
 <br>
 <br>
