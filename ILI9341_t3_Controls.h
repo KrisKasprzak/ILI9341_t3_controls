@@ -1,39 +1,34 @@
 /*
+The MIT License (MIT)
 
-	The MIT License (MIT)
+library writen by Kris Kasprzak
 
-	library writen by Kris Kasprzak
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy of
-	this software and associated documentation files (the "Software"), to deal in
-	the Software without restriction, including without limitation the rights to
-	use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-	the Software, and to permit persons to whom the Software is furnished to do so,
-	subject to the following conditions:
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-	FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-	COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-	IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-	CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+On a personal note, if you develop an application or product using this library
+and make millions of dollars, I'm happy for you!
 
-	On a personal note, if you develop an application or product using this library
-	and make millions of dollars, I'm happy for you!
-
-	rev	date	author		change
-	1.0	9/2019	kasprzak	initial code
-	2.0	9/2020	kasprzak	added shapes and sizes for handles
-	3.0	10/2020	kasprzak	fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-	4.0	11/2020	kasprzak	fixed bugs added Button, Checkbox, OptionButton classes
-	5.0	11/2020	kasprzak	modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-	5.1	4/2021	kasprzak	added changed() back into sliderH and SliderV improved touch/control accuracy
-	5.2	4/2021	kasprzak		added changed back to SliderV and SliderH, improved touch / control location
-	5.3	4/2021	kasprzak		added redraw code to the change handle size and shape, that way the old gets painted out upon a change (after init())
-	5.31	4/2021	kasprzak		fixed snap issue in horizontal slider and draw issue with double triangle in horizontal slider
-
-
+rev		date			author				change
+1.0		9/2019			kasprzak			initial code
+2.0		9/2020			kasprzak			added shapes and sizes for handles
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
+5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+5.4		12/2021			kasprzak			added ring sliders 
 */
 
 
@@ -66,7 +61,15 @@
 #define HANDLE_TRIANGLE_1 3
 #define HANDLE_TRIANGLE_2 4
 #define HANDLE_TRIANGLE_3 5
+#define HANDLE_RECTANGLE 6
 
+#define LOCATION_TOP 0
+#define LOCATION_BOTTOM 1
+
+#define DISABLED 0
+#define ENABLED 1
+
+/*
 #define	C_BLACK   		0x0000
 #define	C_BLUE    		0x001F
 #define	C_RED     		0xF800
@@ -107,6 +110,9 @@
 #define C_DKGREY      	0x3186
 
 #define C_MDGREY      	0x7BCF
+ */
+
+
 
 
 #define B_PRESSED true
@@ -124,6 +130,37 @@
 #define C_DISABLE_LIGHT 0xC618
 #define C_DISABLE_MED	0x7BCF
 #define C_DISABLE_DARK	0x3186
+
+
+ class PRTime {
+
+public:
+
+	PRTime();
+
+	void startTime();
+
+	void resetStart();
+
+	unsigned long getElapsedTimeS();
+
+	unsigned long getTotalTimeS();
+
+	unsigned long getElapsedTimeMS();
+
+	unsigned long getTotalTimeMS();
+
+	void restartElapsedTime();
+
+unsigned long starttime;
+	unsigned long startetime;
+
+
+private:
+	
+
+};
+
 
 class BarChartH {
 
@@ -247,15 +284,29 @@ public:
 
 	void setYAxis(float Ylow, float YHigh, float YInc);
 
+	void setXAxis(float XAxisLow, float XAxisHigh, float XAxisInc);
+
 	void showTitle(bool val);
 
 	void showLegend(bool val);
+
+	void showAxisLabels(bool val);
+
+	void drawLegend(byte Location);
 
 	void showXScale(bool val);
 
 	void showYScale(bool val);
 
 	void setMarkerSize(int ID, byte val);
+
+	void setLineThickness(int ID, byte val);
+
+	void setTitle(const char *Title);
+
+	void setXAxisName(const char *Name);
+
+	void setYAxisName(const char *Name);
 
 	void drawGraph();
 
@@ -267,15 +318,15 @@ private:
 		int ID = 0;
 		float x, y;
 		float	i, j;
-		bool	st, sl, sxs, sys;
+		bool	st, sl, sal, sxs, sys;
 		float	Delta;
 		int k;
 		float	XLow, XHigh, XInc;
 		float	YLow, YHigh, YInc;
 		bool RedrawGraph = true;
 		bool HaveFirstPoint[10];
-		float		XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
-		float		XDec = 0.0, YDec = 0.0;
+		float	XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
+		float	XDec = 0.0, YDec = 0.0;
 		char	text[30];
 		byte	oOrientation = 0;
 		float	gx, gy, gw, gh;
@@ -283,6 +334,7 @@ private:
 		char buf0[20], buf1[20], buf2[20], buf3[20], buf4[20], buf5[20], buf6[20], buf7[20], buf8[20], buf9[20];
 		char    *dl[20] = {buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf6, buf8, buf9};
 		char	t[20];
+		byte tl = 0; // title location
 		char	xa[20];
 		char	ya[20];
 		uint16_t tc;
@@ -292,6 +344,7 @@ private:
 		uint16_t bc;
 		uint16_t pc;
 		byte pdia[20];
+		byte linet[20];
 
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 
@@ -380,6 +433,8 @@ class SliderH {
 
 	void setHandleSize(int size);
 
+	void setHandleSize(int size, int width);
+
 	void disable();
 
 	void enable();
@@ -387,14 +442,16 @@ class SliderH {
 	void show();
 
 	void hide();
-	
-	bool changed();
+
+        void setBarThickness(byte Thickness);
 
 	void setHandleShape(byte shape);
 
 	void drawSliderColor(bool color);
 
 	void setPressDebounce(byte Debounce);
+
+	void resetScale(float ScaleLow, float ScaleHi, float Scale, float Snap);
 
 	float value;
 
@@ -409,11 +466,12 @@ private:
 	uint16_t tsColor;
 	uint16_t ssColor;
 	uint16_t thColor;
-	uint16_t x;
-	uint16_t y;
+	float x;
+	float y;
 	uint16_t l;			// the left coordinate of the scale
 	uint16_t t;			// the top coordinate of the scale
 	uint16_t w;			// the width of the scale
+	byte bt;			// the thockness of the bar
 	float ox;			// the old screen x value where user pressed
 	bool enabled;
 	float sl;				// the scale lower value
@@ -424,13 +482,12 @@ private:
 	float ce;				// the tick mark where zero is (for drawing heavy line on +/- scales
 	float i;				// loop counter
 	int handlesize;
+	int handlewidth;	
 	byte handleshape;
 	bool visible;
 	bool colorscale;		// flag to draw slider in handle color
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh); // why Arduino has no mapping for floats is beyond me, here it is...
 	byte debounce;
-	bool pressed = false;
-	bool SliderIsDrawn = false;
 	
   };
 
@@ -451,6 +508,8 @@ class SliderV {
 	void setHandleColor(uint16_t HandleColor);		// method to just draw the handle (useful for showing handle in green for OK value
 
 	void setHandleSize(int val);
+
+	void setHandleSize(int size, int width);
 	
 	void setHandleShape(byte val);
 
@@ -460,13 +519,13 @@ class SliderV {
 
 	void setScale(float ScaleLow, float ScaleHi, float scale = 0.0, float snap= 0.0);
 
+	void setBarThickness(byte Thickness);
+
 	void disable();
 
 	void enable();
 
 	void show();
-	
-	bool changed();
 
 	void hide();
 
@@ -490,6 +549,7 @@ private:
 	uint16_t t;			// the top coordinate of the scale
 	uint16_t w;			// the with of the scale
 	uint16_t h;			// the with of the scale
+	byte bt;			// the thockness of the bar
 	float oy;			// the old screen y value where user pressed
 	float sl;				// the scale lower value
 	float sh;				// the scale upper value
@@ -503,12 +563,11 @@ private:
 	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh);// why Arduino has no mapping for floats is beyond me, here it is...
 	int tLen, tHi;
 	int handlesize;
+	int handlewidth;
 	byte handleshape;
 	bool enabled;
 	bool visible;
 	byte debounce;
-	bool pressed = false;
-	bool SliderIsDrawn = false;
   };
 
 class SliderOnOff {
@@ -564,8 +623,8 @@ public:
 		fillcolor = ButtonColor;
 		textcolor = TextColor;
 		backcolor = BackgroundColor;
-		disablecolorfill = C_DISABLE_DARK;
-		disablecolortext = C_DISABLE_MED;
+		disablecolorfill = C_DISABLE_LIGHT;
+		disablecolortext = C_DISABLE_DARK;
 		x_offset = TextOffsetX;
 		y_offset = TextOffsetY;
 		strncpy(label, ButtonText, 20);
@@ -608,7 +667,7 @@ public:
 
 		if (newcorner){
 			newcorner = false;
-			d->fillRect(x - (w/2), y - (h/2), w, h, backcolor);
+			// d->fillRect(x - (w/2), y - (h/2), w, h, backcolor);
 		}
 
 
@@ -674,6 +733,7 @@ public:
 
 	void show() {
 		visible = true;
+		draw();
 	}
 
 
@@ -694,16 +754,18 @@ public:
 
 	void disable() { 
 		enabled = false;
+		
 	}
 	void enable() { 
 		enabled = true;
+		
 	}
 
 
 	void resize(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonW, uint8_t ButtonH) {
-		hide();
-		draw();
-		show();
+		//hide();
+		//draw();
+		//show();
 		x = ButtonX;
 		y = ButtonY;
 		w = ButtonW;
@@ -749,6 +811,7 @@ public:
 		debounce = Debounce;
 	}
 	
+
 	int value;
 
 private:
@@ -856,14 +919,14 @@ public:
 		d->print(label);
 	}
 
-	bool press(int16_t ScreenX, int16_t ScreenY) {
+	bool press(int16_t SceenX, int16_t ScreenY) {
 		bool pressed = false;
-		
+
 		if ((!visible) || (!enabled)) {
 			return pressed;
 		}
 
-		if (   ( (ScreenX >= x) && (ScreenX <= (x + s) )) && ((ScreenY >= y-s) && (ScreenY <= (y)))   ) {	
+		if (   ( (SceenX >= x) && (SceenX <= (x + s) )) && ((ScreenY >= y-s) && (ScreenY <= (y)))   ) {	
 			state = !state;
 			draw(state);
 			delay(debounce);
@@ -1069,9 +1132,6 @@ public:
 
 	bool press(uint16_t ScreenX, uint16_t ScreenY) {
 		bool pressed = false;
-		
-		ScreenX = ScreenX - 2*r;
-		
 		if ((!visible) || (!enabled)) {
 			return pressed;
 		}
@@ -1181,6 +1241,76 @@ private:
 	byte debounce;
 };
 
+
+class SliderD {
+
+ public:
+
+	SliderD(ILI9341_t3 *Display); // class constructor
+  
+	void init(uint16_t SliderX, uint16_t SliderY, uint16_t SliderR, float SweepAngle, float ScaleLow, float ScaleHi, uint16_t SliderColor, uint16_t BackgroundColor, uint16_t HandleColor);	// initializer
+   
+	void draw(float val);						// method to draw complete slider
+   
+	bool slide(uint16_t ScreenX, uint16_t ScreenY);	   // method to move handle as user drags finger over handle, this method automatically looks for a valid range press
+    
+	void setColors(uint16_t SliderColor, uint16_t BackgroundColor, uint16_t HandleColor);	// way to reset colors (useful for drawing enabled or disabled)
+
+	void setHandleColor(uint16_t HandleColor);		// method to just draw the handle (useful for showing handle in green for OK value
+
+	void setHandleSize(int val);
+
+	void drawSliderColor(bool val);
+
+	void setDisableColor(uint16_t HandleColor, uint16_t SliderColor);	// method to just draw the handle (useful for showing handle in green for OK value
+
+	void setScale(float ScaleLow, float ScaleHi);
+
+	void setRingThickness(byte Thickness);
+
+	void disable();
+
+	void enable();
+
+	void show();
+
+	void hide();
+
+	void setPressDebounce(byte Debounce);
+
+	float value;
+	bool state;
+
+private:
+
+	ILI9341_t3 *d;			// the display object
+	uint16_t sColor;		// the slider color
+	uint16_t bColor;		// the slider background color
+	uint16_t hColor;		// the sliders drag handle
+	uint16_t dsColor;
+	uint16_t dhColor;
+	uint16_t tsColor;
+	uint16_t thColor;
+	uint16_t x;			// the left coordinate of the scale
+	uint16_t y;			// the top coordinate of the scale
+	uint16_t r;			// the left coordinate of the scale
+	float sa, as, ae; // sweep angle, start angle, end angle
+	byte dt;
+	float sl;				// the scale lower value
+	float sh;				// the scale upper value
+	float angle, oangle, hx, hy;				// the screen coordinate position
+	float i;				// loop counter
+	float dist;
+	bool colorscale;		// flag to draw slider in handle color
+	bool pressed = false;
+	float MapFloat(float x, float fromLow, float fromHigh, float toLow, float toHigh);// why Arduino has no mapping for floats is beyond me, here it is...
+	int handlesize;
+	bool enabled;
+	bool visible, redraw;
+	byte debounce;
+	void DrawRing(float start, float end, uint16_t color);
+	void DrawHandle(float angle, uint16_t hColor, uint16_t sColor);
+  };
 
 
 #endif
