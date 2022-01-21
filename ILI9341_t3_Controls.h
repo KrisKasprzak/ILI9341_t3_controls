@@ -69,7 +69,7 @@ rev		date			author				change
 #define DISABLED 0
 #define ENABLED 1
 
-/*
+
 #define	C_BLACK   		0x0000
 #define	C_BLUE    		0x001F
 #define	C_RED     		0xF800
@@ -110,9 +110,6 @@ rev		date			author				change
 #define C_DKGREY      	0x3186
 
 #define C_MDGREY      	0x7BCF
- */
-
-
 
 
 #define B_PRESSED true
