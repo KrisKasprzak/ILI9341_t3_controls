@@ -572,7 +572,9 @@ void CGraph::drawGraph() {
 
 	// draw vertical lines
 	for (j = 0; j <= xDiv; j++) {
-		d->drawFastVLine(gx + ((0+j) * xlen), gy - gh, gh, gc);
+		if (j > 0) {
+			d->drawFastVLine(gx + ((0+j) * xlen), gy - gh, gh, gc);
+		}
 		if (xDiv < .1) {
 			XDec = 2;
 		}
@@ -622,7 +624,7 @@ void CGraph::drawGraph() {
 		if (sys){
 			
 			dtostrf(YLow+(YInc*i), 0, YDec,text);
-			d->setCursor(gx-30, gy - (ylen * i)-8);
+			d->setCursor(gx-40, gy - (ylen * i)-8);
 			d->print(text);
 		}
 	}
