@@ -448,7 +448,11 @@ void CGraph::setX(float xpoint){
 
 }
 
+void CGraph::showAxisLabels(bool val){
 
+		sal = val;
+
+}
 
 void CGraph::plot(int cID, float y){
 	
