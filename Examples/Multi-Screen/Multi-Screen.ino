@@ -16,6 +16,7 @@
 #include "font_Arial.h"      // custom fonts that ships with ILI9341_t3.h
 #include "UTouch.h"                     // touchscreen lib
 #include "ILI9341_t3_Controls.h"
+#include <Colors.h>
 
 //my way of defining fonts
 #define F_A24 Arial_24
