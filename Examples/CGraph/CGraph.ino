@@ -1,6 +1,7 @@
 #include <ILI9341_t3.h>           // fast display driver lib
 #include <ILI9341_t3_Controls.h>
 #include <font_Arial.h>           // custom fonts that ships with ILI9341_t3.h
+#include <Colors.h>
 
 // you must create and pass fonts to the function
 #define FONT_TITLE Arial_16
