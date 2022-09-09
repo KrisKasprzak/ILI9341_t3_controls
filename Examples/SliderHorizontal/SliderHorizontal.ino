@@ -43,6 +43,7 @@
 // step 1 include the lib
 #include <ILI9341_t3_Controls.h>  // custom control define file
 #include <font_Arial.h>
+#include <Colors.h>
 
 #define FONT Arial_16
 #define TFT_DC 9                  // DC pin on LCD
