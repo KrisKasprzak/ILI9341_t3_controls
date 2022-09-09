@@ -25,6 +25,7 @@
 // step 1 include the library
 #include <ILI9341_t3_Controls.h>
 #include <font_Arial.h>
+#include <Colors.h>
 
 #define FONT_TITLE Arial_24
 #define FONT_DATA Arial_10
