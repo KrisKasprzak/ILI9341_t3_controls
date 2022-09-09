@@ -2,6 +2,9 @@
 #include <ILI9341_t3_Controls.h>
 #include <font_Arial.h>
 #include <font_ArialBold.h>
+#include <Colors.h>
+
+
 #define FONT_TITLE Arial_16
 #define FONT_DATA Arial_10_Bold
 
