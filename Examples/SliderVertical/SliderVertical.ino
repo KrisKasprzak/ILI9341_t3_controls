@@ -33,6 +33,7 @@
 #include <ILI9341_t3.h>           // fast display driver lib
 #include "UTouch.h"               // touchscreen lib
 #include <ILI9341_t3_Controls.h>  // custom control define file
+#include <Colors.h>
 
 #define TFT_DC 9       // DC pin on LCD
 #define TFT_CS 10      // chip select pin on LCD
