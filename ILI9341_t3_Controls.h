@@ -36,6 +36,8 @@ rev		date			author				change
 #ifndef ILI9341_T3_CONTROLS_H
 #define ILI9341_T3_CONTROLS_H
 
+#define  ILI9341_t3_CONTROLS_VER 5.4
+
 #if ARDUINO >= 100
  #include "Arduino.h"
  #include "Print.h"
