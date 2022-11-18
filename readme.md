@@ -1,3 +1,6 @@
+<b><h2><center>Version 5.5 updated 11/18/2022</center></h1></b>
+1. Improved centering for buttons and graphing text (now uses measureTextWidth(), measureTextHeight() from the ILI9341_t3 library)
+
 <b><h2><center>Version 5.4 updated 12/20/2021</center></h1></b>
 1. Added a ring slider
 
