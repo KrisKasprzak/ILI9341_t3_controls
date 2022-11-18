@@ -88,9 +88,12 @@ void setup() {
 
   // step 3 initialize each button, passing in location, size, colors, button text,
   // button text offsets (to help manage text location on the button and the ILI9341 font
-  Button1.init(60, 20, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK, "Press", -10, -5, FONT_SBUTTON ) ;
-  Button2.init(60, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Disable", -10, -5, FONT_SBUTTON ) ;
-  Button3.init(180, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Radius", -10, -5, FONT_SBUTTON ) ;
+  
+  // you can set 0 for both x and y text offsets, which will center the text on the button
+  // see first 3 buttons
+  Button1.init(60, 20, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK, "Press", 0, 0, FONT_SBUTTON ) ;
+  Button2.init(60, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Disable", 0, 0, FONT_SBUTTON ) ;
+  Button3.init(180, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Radius", 0, 0, FONT_SBUTTON ) ;
   Button4.init(60, 140, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Move", -10, -5, FONT_SBUTTON ) ;
   Button5.init(180, 140, 100, 40, C_BLUE, C_GREEN, C_BLACK, C_BLACK, "ON", -10, -5, FONT_LBUTTON ) ;
 
