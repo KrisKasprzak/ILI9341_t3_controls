@@ -9,11 +9,11 @@ the Software without restriction, including without limitation the rights to
 use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 the Software, and to permit persons to whom the Software is furnished to do so,
 subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
+The above copyright notice and this permissionotice shall be included in all
 copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. InO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -29,12 +29,13 @@ rev		date			author				change
 5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
 5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 5.4		12/2021			kasprzak			added ring sliders 
+5.5 		11/2022			kasprzak			added better text centering control
 */
 
 
 
-#ifndef ILI9341_T3_CONTROLS_H
-#define ILI9341_T3_CONTROLS_H
+#ifndef ILI9341_t3_CONTROLS_H
+#define ILI9341_t3_CONTROLS_H
 
 #define  ILI9341_t3_CONTROLS_VER 5.4
 
@@ -50,6 +51,7 @@ rev		date			author				change
 #endif
 
 #include <ILI9341_t3.h>   
+
 
 #define G_REPAINT 0
 #define G_DRAWOVER 1
@@ -71,7 +73,7 @@ rev		date			author				change
 #define DISABLED 0
 #define ENABLED 1
 
-
+/*
 #define	C_BLACK   		0x0000
 #define	C_BLUE    		0x001F
 #define	C_RED     		0xF800
@@ -112,6 +114,9 @@ rev		date			author				change
 #define C_DKGREY      	0x3186
 
 #define C_MDGREY      	0x7BCF
+ */
+
+
 
 
 #define B_PRESSED true
@@ -129,36 +134,6 @@ rev		date			author				change
 #define C_DISABLE_LIGHT 0xC618
 #define C_DISABLE_MED	0x7BCF
 #define C_DISABLE_DARK	0x3186
-
-
- class PRTime {
-
-public:
-
-	PRTime();
-
-	void startTime();
-
-	void resetStart();
-
-	unsigned long getElapsedTimeS();
-
-	unsigned long getTotalTimeS();
-
-	unsigned long getElapsedTimeMS();
-
-	unsigned long getTotalTimeMS();
-
-	void restartElapsedTime();
-
-unsigned long starttime;
-	unsigned long startetime;
-
-
-private:
-	
-
-};
 
 
 class BarChartH {
@@ -183,7 +158,7 @@ public:
 
 
 private:
-		ILI9341_t3			*d;
+		ILI9341_t3 			*d;
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
@@ -234,7 +209,8 @@ public:
 	void showScale(bool val);
 
 private:
-		ILI9341_t3			*d;
+
+		ILI9341_t3 			*d;
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
@@ -292,9 +268,17 @@ public:
 	void showAxisLabels(bool val);
 
 	void drawLegend(byte Location);
-
+	
+	void resetStart(int ID);
+	
 	void showXScale(bool val);
-
+	
+	void setXTextOffset(int val);
+	
+	void setYTextOffset(int val);
+		
+	void setXTextScale(float val);
+	
 	void showYScale(bool val);
 
 	void setMarkerSize(int ID, byte val);
@@ -311,7 +295,7 @@ public:
 
 private:
 
-		ILI9341_t3			*d;
+		ILI9341_t3 			*d;
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	af;
 		int ID = 0;
@@ -322,6 +306,7 @@ private:
 		int k;
 		float	XLow, XHigh, XInc;
 		float	YLow, YHigh, YInc;
+		float XTextScale;
 		bool RedrawGraph = true;
 		bool HaveFirstPoint[10];
 		float	XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
@@ -329,13 +314,13 @@ private:
 		char	text[30];
 		byte	oOrientation = 0;
 		float	gx, gy, gw, gh;
-		int StartPointX, StartPointY;
+		int StartPointX, StartPointY, XScaleOffset, YScaleOffset;
 		char buf0[20], buf1[20], buf2[20], buf3[20], buf4[20], buf5[20], buf6[20], buf7[20], buf8[20], buf9[20];
 		char    *dl[20] = {buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf6, buf8, buf9};
-		char	t[20];
+		char	title[40];
 		byte tl = 0; // title location
-		char	xa[20];
-		char	ya[20];
+		char	xatitle[40];
+		char	yatitle[40];
 		uint16_t tc;
 		uint16_t dc[10];
 		uint16_t ac;
@@ -344,9 +329,7 @@ private:
 		uint16_t pc;
 		byte pdia[20];
 		byte linet[20];
-
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
-
 
 };
 
@@ -361,10 +344,10 @@ public:
 private:
 	
 	bool Redraw = true;
-	ILI9341_t3			*d;			
+	ILI9341_t3 			*d;			
 	ILI9341_t3_font_t	tf;
 	ILI9341_t3_font_t	df;
-	char t[10];
+	char t[40];
 	int cx;
 	int cy;
 	int dr;
@@ -646,16 +629,14 @@ public:
 			return;
 		}
 
-		if (! inverted) {
+		if (!inverted) {
 			drawit = true;
 			fill = fillcolor;
 			outline = outlinecolor;
 			text = textcolor;
 		} 
 		else {
-			
 			if (drawit == false) {
-				
 				return;
 			}
 			drawit = false;
@@ -685,13 +666,12 @@ public:
 				d->drawRoundRect(x - (w/2), y - (h/2), w, h, ct, disablecolortext);
 			}
 			
-			d->setCursor(x + x_offset - (strlen(label)*3) , y + y_offset);
-			d->setFont(f);
-			d->setTextColor(disablecolortext);
-			d->print(label);
+			d->setTextColor(disablecolortext);	
+
 		}
 		else{
 			if (ct == CORNER_AUTO){
+			
 				d->fillRoundRect(x - (w/2), y - (h/2), w, h, min(w,h)/4, fill);
 				d->drawRoundRect(x - (w/2), y - (h/2), w, h, min(w,h)/4, outline);
 			}
@@ -704,12 +684,20 @@ public:
 				d->drawRoundRect(x - (w/2), y - (h/2), w, h, ct, outline);
 			}
 
-			d->setCursor(x + x_offset - (strlen(label)*3) , y + y_offset);
-			d->setFont(f);
 			d->setTextColor(text);
-			d->print(label);
+
 		}
 		
+		d->setFont(f);
+
+		if ((x_offset == 0) && (y_offset == 0)){
+			d->setCursor(x - (d->measureTextWidth(label)/2), y - (d->measureTextHeight(label)/2));
+		}
+		else {
+			d->setCursor(x + x_offset - (strlen(label)*3) , y + y_offset);
+		}
+		d->print(label);
+				
 	}
 
 	bool press(int16_t ScreenX, int16_t ScreenY) {
@@ -911,10 +899,17 @@ public:
 	
 		d->fillRoundRect(x, y-s, s, s, ct, fill);
 		d->drawRoundRect(x, y-s, s, s, ct, outline);
-
-		d->setCursor(x + tox+(s/2), y - s + toy);
+		
 		d->setFont(f);
 		d->setTextColor(tcolor);
+		
+		if (toy == 0) {
+			d->setCursor(x + tox+(s/2), y - (s/2)- (d->measureTextHeight(label)/2));
+		}
+		else {
+			d->setCursor(x + tox+(s/2), y - s + toy);
+		}
+		
 		d->print(label);
 	}
 
