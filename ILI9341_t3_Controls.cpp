@@ -29,6 +29,8 @@
 	5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
 	5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 	5.4		12/2021			kasprzak			added ring sliders 
+	5.5 	11/2022			kasprzak			added better text centering control
+	
 */
 
 
@@ -38,55 +40,6 @@
 
 
 float degtorad = .0174532778;
-
-PRTime::PRTime(){
-
-
-}
-
-void PRTime::startTime( ){
-
-	starttime = millis();
-	startetime = starttime;
-
-}
-
-void PRTime::resetStart( ){
-
-	starttime = millis();
-
-}
-
-unsigned long PRTime::getElapsedTimeS( ){
-
-	return ((millis() - startetime) / 1000);
-
-}
-
-unsigned long PRTime::getTotalTimeS( ){
-
-	return ((millis() - starttime) / 1000) ;
-
-}
-
-unsigned long PRTime::getElapsedTimeMS( ){
-
-	return (millis() - startetime);
-
-}
-
-unsigned long PRTime::getTotalTimeMS( ){
-
-	return (millis() - starttime);
-
-}
-
-void PRTime::restartElapsedTime( ){
-
-	startetime = millis();
-	
-}
-
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +52,6 @@ horizontal bar chart
 BarChartH::BarChartH(ILI9341_t3 *Display){
 
 	d = Display;
-
 		
 }
 
@@ -399,10 +351,11 @@ CGraph::CGraph(ILI9341_t3 *disp, float GraphXLoc, float GraphYLoc, float GraphWi
 
 void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor, uint16_t PlotColor, const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &AxisFont ){
 
-	strncpy(t, Title, 30);
-	strncpy(xa, XAxis, 30);
-	strncpy(ya, YAxis, 30);
+	strncpy(title, Title, 40);
+	strncpy(xatitle, XAxis, 40);
+	strncpy(yatitle, YAxis, 40);
 	
+
 	tf = TitleFont;
 	af = AxisFont;
 	tc = TextColor;
@@ -417,6 +370,10 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 	sal = true;
 	sxs = true;
 	sys = true;
+	
+	XScaleOffset = 20;
+	YScaleOffset = 40;
+	XTextScale = 1.0;
 
 	Delta = XHigh - XLow;
 
@@ -424,10 +381,10 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 
 	TextHeight = tf.cap_height;
 
-}
+	}
 
 int CGraph::add(const char *name, uint16_t color){
-
+	
 	// max number of plots is 10
 	if (ID >= 10){
 		return -1;
@@ -438,13 +395,14 @@ int CGraph::add(const char *name, uint16_t color){
 	dc[ID] = color;
 	HaveFirstPoint[ID] = false;
 	ID++;	
+		
 	return ID-1;
-
+	
 }
 
 void CGraph::setX(float xpoint){
 
-	x = xpoint;
+		x = xpoint;
 
 }
 
@@ -471,6 +429,7 @@ void CGraph::plot(int cID, float y){
 	if (YPoint < (gy - gh)) {
 		YPoint = gy - gh;
 	}
+	
 
 	if ((XPoint > gx) && (XPoint < gx + gw)) {
 		if (HaveFirstPoint[cID]){
@@ -511,27 +470,48 @@ void CGraph::setMarkerSize(int cID, byte val){
 }
 
 void CGraph::setLineThickness(int cID, byte val){
-
+	
 	linet[cID] = val;
 
 }
 
 void CGraph::setTitle(const char *Title){
 
-	strncpy(t, Title, 30);
+	strncpy(title, Title, 40);
 
 }
 
 void CGraph::setXAxisName(const char *XAxis){
 
-	strncpy(xa, XAxis, 30);
+	strncpy(xatitle, XAxis, 40);
 
 }
 
+void CGraph::setXTextOffset(int val){
+	
+	XScaleOffset = val;
+
+}
+
+void CGraph::setYTextOffset(int val){
+	
+	YScaleOffset = val;
+}
+
+void CGraph::setXTextScale(float val){
+	
+	XTextScale = val;
+}
 
 void CGraph::setYAxisName(const char *YAxis){
 
-	strncpy(ya, YAxis, 30);
+	strncpy(yatitle, YAxis, 40);
+
+}
+
+void CGraph::resetStart(int ID){
+
+	HaveFirstPoint[ID] = false;
 
 }
 
@@ -542,10 +522,7 @@ void CGraph::drawLegend(byte Location){
 
 }
 
-
-
 void CGraph::drawGraph() {
-
 
 	RedrawGraph = false;
 	byte to = 0;
@@ -563,8 +540,8 @@ void CGraph::drawGraph() {
 	// draw title
 	if (st){
 		d->setFont(tf);
-		d->setCursor(gx , gy - gh - TextHeight-10);
-		d->print(t);
+		d->setCursor(gx, gy - gh - TextHeight-10);
+		d->print(title);
 	}
 
 	// draw grid lines
@@ -576,7 +553,7 @@ void CGraph::drawGraph() {
 
 	// draw vertical lines
 	for (j = 0; j <= xDiv; j++) {
-		if (j > 0) {
+		if(j > 0){
 			d->drawFastVLine(gx + ((0+j) * xlen), gy - gh, gh, gc);
 		}
 		if (xDiv < .1) {
@@ -603,9 +580,13 @@ void CGraph::drawGraph() {
 		}
 
 		if (sxs){
-			dtostrf(XLow+(XInc*j), 0, XDec,text);
-			d->setCursor(gx + (j * xlen) - to, gy+5);
+			dtostrf((XLow+(XInc*j)) * XTextScale, 0, XDec,text);
+			//d->setCursor(gx + (j * xlen) - to, gy+XScaleOffset);
+			
+			d->setCursor(gx + (j * xlen)- (d->measureTextWidth(text)/2), gy+XScaleOffset);
+			
 			d->print(text);
+			
 		}
 	}
 
@@ -628,8 +609,13 @@ void CGraph::drawGraph() {
 		if (sys){
 			
 			dtostrf(YLow+(YInc*i), 0, YDec,text);
-			d->setCursor(gx-40, gy - (ylen * i)-8);
+			d->setCursor(gx-YScaleOffset, gy - (ylen * i)-(d->measureTextHeight(text)/2));
+			
+			//d->setCursor(gx + (j * xlen)- (d->measureTextWidth(text)/2), gy+XScaleOffset);
+			
+			
 			d->print(text);
+
 		}
 	}
 
@@ -648,7 +634,6 @@ void CGraph::drawGraph() {
 	d->drawFastVLine(gx-1, gy - gh, gh+1, ac);
 	d->drawFastVLine(gx-2, gy - gh, gh+1, ac);
 	
-
 	// draw legend
 	if (sal){
 		// draw y label
@@ -656,24 +641,30 @@ void CGraph::drawGraph() {
 		d->setTextColor(tc, bc);
 		d->setRotation(oOrientation - 1);
 		d->setCursor(d->width()-gy,gx-44);	
-		d->print(ya);
+		d->print(yatitle);
 		d->setRotation(oOrientation);
-
+		//Serial.println(yatitle);
 
     	// draw x label
 		d->setTextColor(tc, bc);
 		d->setCursor(gx,gy+ TextHeight+5);	
-		d->print(xa);
+		d->print(xatitle);
+
+		//Serial.println(xatitle);
+
 	}
 	if (sl) {
 		// draw legend
 		StartPointX = gx-20;
+		
+		StartPointX = gx + d->measureTextWidth(xatitle) + 10;
 			
 		if (tl == LOCATION_TOP){
 			StartPointY = gy - gh;
 		}
 		else if (tl == LOCATION_BOTTOM) {
-			StartPointY = d->getCursorY() +13;
+			//StartPointY = d->getCursorY() +13;
+			StartPointY = gy+ TextHeight+5;	
 		}
 
 		for (k = 0; k <= ID; k++){
@@ -715,6 +706,7 @@ void CGraph::showTitle(bool val){
 }
 
 void CGraph::showLegend(bool val){
+
 	sl = val;
 }
 void CGraph::showXScale(bool val){
