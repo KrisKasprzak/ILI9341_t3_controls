@@ -624,7 +624,7 @@ public:
 	// color 565 icon, no text
 	
 	void init(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonWidth, uint8_t ButtonHeight,
-		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t TextColor, uint16_t BackgroundColor,
+		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t BackgroundColor,
 		const uint16_t  *UpIcon, const uint16_t *DnIcon, int16_t IconWidth, int16_t IconHeight, int OffsetLeft, int OffsetTop ) {
 
 		x = ButtonX;
@@ -633,7 +633,6 @@ public:
 		h = ButtonHeight;
 		outlinecolor = OutlineColor;
 		fillcolor = ButtonColor;
-		textcolor = TextColor;
 		backcolor = BackgroundColor;
 		disablecolorfill = C_DISABLE_LIGHT;
 		disablecolortext = C_DISABLE_DARK;
