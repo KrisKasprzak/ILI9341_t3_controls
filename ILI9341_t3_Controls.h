@@ -618,9 +618,43 @@ public:
 		debounce = TFT_DEBOUNCE;
 		value = 0; // user controlled for whatever....
 		newcorner = false;
-
+		HasIcon = false;
 	}
 
+	// color 565 icon, no text
+	
+	void init(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonWidth, uint8_t ButtonHeight,
+		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t TextColor, uint16_t BackgroundColor,
+		const uint16_t  *UpIcon, const uint16_t *DnIcon, int16_t IconWidth, int16_t IconHeight, int OffsetLeft, int OffsetTop ) {
+
+		x = ButtonX;
+		y = ButtonY;
+		w = ButtonWidth;
+		h = ButtonHeight;
+		outlinecolor = OutlineColor;
+		fillcolor = ButtonColor;
+		textcolor = TextColor;
+		backcolor = BackgroundColor;
+		disablecolorfill = C_DISABLE_LIGHT;
+		disablecolortext = C_DISABLE_DARK;
+		x_offset = OffsetLeft;
+		y_offset = OffsetTop;
+		ct = CORNER_AUTO;
+		HasIcon = true;
+		upicon = UpIcon;
+		dnicon = DnIcon;
+		iconw = IconWidth;
+		iconh = IconHeight;
+		bt = 4;
+		drawit = true;
+		enabled = true;
+		visible = true;
+		debounce = TFT_DEBOUNCE;
+		value = 0; // user controlled for whatever....
+		newcorner = false;
+
+	}
+	
 	void draw(bool inverted = false) {
 
 		uint16_t fill, outline, text;
@@ -688,15 +722,32 @@ public:
 
 		}
 		
-		d->setFont(f);
+		if (!HasIcon){
+		
+			d->setFont(f);
 
-		if ((x_offset == 0) && (y_offset == 0)){
-			d->setCursor(x - (d->measureTextWidth(label)/2), y - (d->measureTextHeight(label)/2));
+			if ((x_offset == 0) && (y_offset == 0)){
+				d->setCursor(x - (d->measureTextWidth(label)/2), y - (d->measureTextHeight(label)/2));
+			}
+			else {
+				d->setCursor(x + x_offset , y + y_offset);
+			}
+			d->print(label);
 		}
 		else {
-			d->setCursor(x + x_offset - (strlen(label)*3) , y + y_offset);
+
+			if (!inverted) {
+				if (enabled) {
+					draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, upicon, iconw, iconh );
+				}
+				else {
+					draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, dnicon, iconw, iconh );
+				}
+			}
+			else {
+				draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, dnicon, iconw, iconh );
+			}
 		}
-		d->print(label);
 				
 	}
 
@@ -804,17 +855,37 @@ public:
 private:
 	ILI9341_t3 *d;
 	ILI9341_t3_font_t f;
+	
+	void draw565Bitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h) {
+
+	  uint16_t offset = 0;
+
+	  int j, i;
+
+	  for (i = 0; i < h; i++) {
+		for (j = 0; j < w; j++) {
+		  d->drawPixel(j + x, i + y, bitmap[offset]);
+		  offset++;
+		}
+	  }
+
+	}
+	
 	int16_t x, y;
-	uint16_t w, h;
-	int x_offset, y_offset;
+	int16_t w, h;
+	int16_t x_offset, y_offset;
+	int16_t iconh, iconw;
 	bool redraw;
 	uint16_t outlinecolor, fillcolor, textcolor, backcolor, disablecolorfill, disablecolortext;
 	char label[20];
+	bool HasIcon;
+	const uint16_t *upicon;
+	const uint16_t *dnicon;
 	boolean drawit;
 	bool enabled;
 	int ct;
 	bool visible;
-	byte debounce;
+	uint8_t debounce, bt;
 	bool newcorner;
 
 };
