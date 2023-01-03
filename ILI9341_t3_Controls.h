@@ -30,6 +30,8 @@ rev		date			author				change
 5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 5.4		12/2021			kasprzak			added ring sliders 
 5.5 		11/2022			kasprzak			added better text centering control
+5.6 		1/2023			kasprzak			added icons for buttons
+
 */
 
 
