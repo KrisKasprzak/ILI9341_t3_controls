@@ -30,6 +30,7 @@ rev		date			author				change
 5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 5.4		12/2021			kasprzak			added ring sliders 
 5.5 	11/2022			kasprzak			added better text centering control
+6.0 	2/2023			kasprzak			added support for icons on buttons
 */
 
 
@@ -37,7 +38,7 @@ rev		date			author				change
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
-#define  ILI9341_t3_CONTROLS_VER 5.4
+#define  ILI9341_t3_CONTROLS_VER 6.0
 
 #if ARDUINO >= 100
  #include "Arduino.h"
