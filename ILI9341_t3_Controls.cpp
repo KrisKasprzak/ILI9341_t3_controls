@@ -31,7 +31,7 @@
 	5.4		12/2021			kasprzak			added ring sliders 
 	5.5 		11/2022			kasprzak			added better text centering control
 	5.6 		1/2023			kasprzak			added icons for buttons
-	
+	6.0 	2/2023			kasprzak			added support for icons on buttons
 */
 
 
