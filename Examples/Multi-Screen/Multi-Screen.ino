@@ -236,8 +236,6 @@ void Process_Equalizer() {
   // process equalizer screen, here we enter a loop until user exists
   // inside the loop we process any button presses, etc.
 
-  bool KeepIn = true;
-
   // draw the ui
   Draw_EqualizerScreen();
   // draw some updatable text on the ui screen
@@ -246,7 +244,7 @@ void Process_Equalizer() {
   Draw_EqualizerText();
 
   // begin the proceessing loop
-  while (KeepIn) {
+  while (1) {
 
     if (Touch.dataAvailable()) {
       // my way of handling screen presses and adjusting to get correct screen coorinates--since different
@@ -270,7 +268,7 @@ void Process_Equalizer() {
       // user exists, then get out of loop and control returned to after
       // Process_Equalizer();
       if (ProcessButtonPress(DoneBTN)) {
-        KeepIn = false;
+        break;
       }
 
       // here's why I go throuhg the trouble of having all these darn screen drawing
@@ -365,14 +363,11 @@ void Draw_EqualizerText() {
 
 void Process_SettingsScreen() {
 
-  // the flag to enter a processing loop
-  bool KeepIn = true;
-
   // yep, here we go, draw the darn contents, but proces screen presses in this screen.
   Draw_SettingsScreen();
 
   // begin the processing loop as in all my processing screens
-  while (KeepIn) {
+  while (1) {
     if (Touch.dataAvailable()) {
 
       ProcessTouch();
@@ -419,7 +414,7 @@ void Process_SettingsScreen() {
         // now were exiting this process screen meaning we're
         // returning control back to the equalizer process loop
         // so after returing we will need to redraw the process equalizer screen
-        KeepIn = false;
+        break;
       }
 
     }
@@ -454,10 +449,6 @@ void Draw_SettingsScreen() {
 // if you have no sub screens, you don't have a reason
 // to simplify drawing UI, here we'll just draw the UI
 void Process_SetColors() {
-
-  // typical flag for the ui processing loop
-  bool KeepIn = true;
-
   // draw all the UI
   Display.fillScreen(BackColor);
   Display.fillRect(0, 0, 480, 50, C_DKBLUE);
@@ -478,7 +469,7 @@ void Process_SetColors() {
 
   // start processing UI, again keep in this loop, with displayed UI until user
   // presses done button
-  while (KeepIn) {
+  while (1) {
 
     if (Touch.dataAvailable()) {
       ProcessTouch();
@@ -492,7 +483,7 @@ void Process_SetColors() {
       Display.fillRect(203, 83, 94, 94, BackColor);
 
       if (ProcessButtonPress(DoneBTN)) {
-        KeepIn = false;
+        break;
       }
     }
 
