@@ -12,7 +12,7 @@
     const char *ButtonText, int TextOffsetX, int TextOffsetY, const ILI9341_t3_font_t &TextFont ) {
   void draw(bool inverted = false) {
   bool press(int16_t ScreenX, int16_t ScreenY) {
-  
+
   // optional button methods
   void hide()
   void disable()
@@ -22,10 +22,10 @@
   void setFont(int TextOffsetX, int TextOffsetY, const ILI9341_t3_font_t &TextFont)
   void setText(const char *ButtonText)
   void setCornerRadius(int radius)
-  bool isEnabled() 
-  bool isVisible() 
-  void setPressDebounce(byte Debounce) 
-  
+  bool isEnabled()
+  bool isVisible()
+  void setPressDebounce(byte Debounce)
+
   int value;
 
 
@@ -44,17 +44,67 @@
 #include <ILI9341_t3_Controls.h>
 #include <font_Arial.h>           // custom fonts that ships with ILI9341_t3.h
 #include <font_ArialBold.h>
-#include "UTouch.h"
-#include <Colors.h>
+#include <XPT2046_Touchscreen.h>
 
 // you must create and pass fonts to the function
 #define FONT_TEXT Arial_24
 #define FONT_LBUTTON Arial_16
 #define FONT_SBUTTON Arial_12_Bold
 
+
+#define C_WHITE       0xFFFF
+#define C_BLACK       0x0000
+#define C_GREY        0xC618
+#define C_BLUE        0x001F
+#define C_RED         0xF800
+#define C_GREEN       0x07E0
+#define C_CYAN        0x07FF
+#define C_MAGENTA     0xF81F
+#define C_YELLOW      0xFFE0  
+#define C_TEAL      0x0438       
+#define C_ORANGE        0xDC00          
+#define C_PINK          0xF81F
+#define C_PURPLE    0x801F
+#define C_LTGREY        0xE71C  
+#define C_LTBLUE    0x73DF    
+#define C_LTRED         0xFBAE
+#define C_LTGREEN       0x7FEE
+#define C_LTCYAN    0x77BF
+#define C_LTMAGENTA     0xFBB7
+#define C_LTYELLOW      0xF7EE
+#define C_LTTEAL    0x77FE  
+#define C_LTORANGE      0xFDEE
+#define C_LTPINK        0xFBBA
+#define C_LTPURPLE    0xD3BF
+#define C_DKGREY        0x52AA
+#define C_DKBLUE        0x080B
+#define C_DKRED         0x7800
+#define C_DKGREEN       0x03C2   
+#define C_DKCYAN        0x032F  
+#define C_DKMAGENTA     0x900B
+#define C_DKYELLOW      0x94A0
+#define C_DKTEAL    0x0452
+#define C_DKORANGE    0x92A0         
+#define C_DKPINK        0x9009
+#define C_DKPURPLE      0x8012  
+#define C_MDGREY        0x7BCF  
+#define C_MDBLUE    0x1016
+#define C_MDRED       0xB000
+#define C_MDGREEN     0x0584
+#define C_MDCYAN      0x04B6
+#define C_MDMAGENTA   0xB010
+#define C_MDYELLOW      0xAD80    
+#define C_MDTEAL    0x0594     
+#define C_MDORANGE      0xB340           
+#define C_MDPINK        0xB00E
+
 // For the Adafruit shield, these are the default.
 #define TFT_DC  9
 #define TFT_CS 10
+
+#define T_CS      0
+#define T_IRQ     1
+
 unsigned long i;
 int BtnX, BtnY, ct = -1;
 bool rs = true, st = true;
@@ -62,7 +112,8 @@ char buf[1];
 // create the display object
 ILI9341_t3 Display(TFT_CS, TFT_DC);
 
-UTouch  Touch( 6, 5, 4, 3, 2);
+XPT2046_Touchscreen Touch(T_CS, T_IRQ);
+TS_Point TP;
 
 // step 2 create a button object for each button, pass in the display object
 Button Button1(&Display);
@@ -82,18 +133,15 @@ void setup() {
   analogWrite(A9, 255);
   // fire up the touch display
 
-  // you may need this depending on your display
-  Touch.InitTouch(PORTRAIT);
-  Touch.setPrecision(PREC_EXTREME);
+  // fire up touch
+  Touch.begin();
+  Touch.setRotation(3); // this may need to be adjusted depending on your display
 
   // step 3 initialize each button, passing in location, size, colors, button text,
   // button text offsets (to help manage text location on the button and the ILI9341 font
-  
-  // you can set 0 for both x and y text offsets, which will center the text on the button
-  // see first 3 buttons
-  Button1.init(60, 20, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK, "Press", 0, 0, FONT_SBUTTON ) ;
-  Button2.init(60, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Disable", 0, 0, FONT_SBUTTON ) ;
-  Button3.init(180, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Radius", 0, 0, FONT_SBUTTON ) ;
+  Button1.init(60, 20, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK, "Press", -10, -5, FONT_SBUTTON ) ;
+  Button2.init(60, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Disable", -10, -5, FONT_SBUTTON ) ;
+  Button3.init(180, 80, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Radius", -10, -5, FONT_SBUTTON ) ;
   Button4.init(60, 140, 100, 40, C_BLUE, C_WHITE, C_BLACK, C_BLACK,  "Move", -10, -5, FONT_SBUTTON ) ;
   Button5.init(180, 140, 100, 40, C_BLUE, C_GREEN, C_BLACK, C_BLACK, "ON", -10, -5, FONT_LBUTTON ) ;
 
@@ -104,13 +152,13 @@ void setup() {
   Button3.draw();
   Button4.draw();
   Button5.draw();
-  
+
 }
 
 
 void loop() {
 
-  if (Touch.dataAvailable()) {
+  if (Touch.touched()) {
 
     ProcessTouch();
 
@@ -199,34 +247,25 @@ void loop() {
 // my code uses global button x and button y locations
 void ProcessTouch() {
 
-  // depending on the touch library you may need to change methods here
-  Touch.read();
-
-  BtnX = Touch.getX();
-  BtnY = Touch.getY();
-
+  TP = Touch.getPoint();
+  BtnX = TP.x;
+  BtnY = TP.y;
   // consistency between displays is a mess...
   // this is some debug code to help show
   // where you pressed and the resulting map
-
-  //Serial.print("real coordinates: ");
-  //Serial.print(BtnX);
-  //Serial.print(",");
-  //Serial.println (BtnY);
-  //Display.drawPixel(BtnX, BtnY, C_RED);
 
   //different values depending on where touch happened
 
   // x  = map(x, real left, real right, 0, 480);
   // y  = map(y, real bottom, real top, 320, 0);
 
-  // tft with yellow headers
-  //BtnX  = map(BtnX, 240, 0, 320, 0);
-  //BtnY  = map(BtnY, 379, 0, 240, 0);
+  //yellow headers
+  BtnX = map(BtnX, 3970, 307, 320, 0);
+  BtnY = map(BtnY, 3905, 237, 240, 0);
 
-  // tft with black headers
-  BtnX  = map(BtnX, 0, 240, 320, 0);
-  BtnY  = map(BtnY, 0, 380, 240, 0);
+  //black headers
+  //BtnX  = map(BtnX, 0, 3905, 320, 0);
+  //BtnY  = map(BtnY, 0, 3970, 240, 0);
 
   Serial.print(", Mapped coordinates: ");
   Serial.print(BtnX);
@@ -245,7 +284,7 @@ bool ProcessButtonPress(Button TheButton) {
 
   if (TheButton.press(BtnX, BtnY)) {
     TheButton.draw(B_PRESSED);
-    while (Touch.dataAvailable()) {
+    while (Touch.touched()) {
       if (TheButton.press(BtnX, BtnY)) {
         TheButton.draw(B_PRESSED);
       }
