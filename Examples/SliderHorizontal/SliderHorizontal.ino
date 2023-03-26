@@ -3,8 +3,6 @@
   MCU                       https://www.amazon.com/Teensy-3-2-with-pins/dp/B015QUPO5Y/ref=sr_1_2?s=industrial&ie=UTF8&qid=1510373806&sr=1-2&keywords=teensy+3.2
   Display                   https://www.amazon.com/Wrisky-240x320-Serial-Module-ILI9341/dp/B01KX26JJU/ref=sr_1_10?ie=UTF8&qid=1510373771&sr=8-10&keywords=240+x+320+tft
   display library           https://github.com/PaulStoffregen/ILI9341_t3
-  touchscreen lib           https://github.com/dgolda/UTouch
-
     available methods
 
     // required
@@ -39,7 +37,7 @@
 
 */
 #include <ILI9341_t3.h>           // fast display driver lib
-#include "UTouch.h"               // touchscreen lib
+#include <XPT2046_Touchscreen.h>
 // step 1 include the lib
 #include <ILI9341_t3_Controls.h>  // custom control define file
 #include <font_Arial.h>
@@ -49,13 +47,72 @@
 #define TFT_DC 9                  // DC pin on LCD
 #define TFT_CS 10                 // chip select pin on LCD
 #define LCD_PIN A9                // lcd pin to control brightness
-
+#define T_CS      1
+#define T_IRQ     0
 // defines for locations
 #define ROW0 30
 #define ROW1 70
 #define ROW2 110
 #define ROW3 150
 #define ROW4 190
+
+
+// http://www.barth-dev.de/online/rgb565-color-picker/
+
+
+#define C_WHITE   		0xFFFF
+#define	C_BLACK   		0x0000
+#define C_GREY       	0xC618
+#define	C_BLUE    		0x001F
+#define	C_RED     		0xF800
+#define	C_GREEN   		0x07E0
+#define C_CYAN    		0x07FF
+#define C_MAGENTA 		0xF81F
+#define C_YELLOW  		0xFFE0  
+#define C_TEAL			0x0438       
+#define C_ORANGE      	0xDC00          
+#define C_PINK        	0xF81F
+#define C_PURPLE		0x801F
+
+
+#define C_LTGREY      	0xE71C  
+#define C_LTBLUE		0x73DF    
+#define C_LTRED       	0xFBAE
+#define C_LTGREEN     	0x7FEE
+#define C_LTCYAN		0x77BF
+#define C_LTMAGENTA   	0xFBB7
+#define C_LTYELLOW    	0xF7EE
+#define C_LTTEAL		0x77FE  
+#define C_LTORANGE    	0xFDEE
+#define C_LTPINK      	0xFBBA
+#define C_LTPURPLE		0xD3BF
+
+//#define C_DKGREY      	0x2124
+#define C_DKGREY      	0x52AA
+#define C_DKBLUE      	0x080B
+#define C_DKRED       	0x7800
+#define C_DKGREEN     	0x03C2   
+#define C_DKCYAN      	0x032F  
+#define C_DKMAGENTA   	0x900B
+#define C_DKYELLOW    	0x94A0
+#define C_DKTEAL		0x0452
+#define C_DKORANGE   	0x92A0         
+#define C_DKPINK      	0x9009
+#define C_DKPURPLE    	0x8012  
+ 
+#define C_MDGREY      	0x7BCF  
+#define C_MDBLUE		0x1016
+#define	C_MDRED     	0xB000
+#define	C_MDGREEN   	0x0584
+#define C_MDCYAN    	0x04B6
+#define C_MDMAGENTA 	0xB010
+#define C_MDYELLOW      0xAD80	  
+#define C_MDTEAL		0x0594     
+#define C_MDORANGE      0xB340           
+#define C_MDPINK        0xB00E
+#define C_MDPURPLE		0x8816 
+
+
 
 byte RedByte = 70, GreenByte = 170, BlueByte = 210, BrightByte = 255;
 int BtnX, BtnY;
@@ -66,9 +123,8 @@ uint16_t color, oldcolor;
 // create display and DS objects
 ILI9341_t3 Display = ILI9341_t3(10, 9);
 
-// create the touch screen object
-// UTouch(byte tclk, byte tcs, byte tdin, byte dout, byte irq);
-UTouch  Touch( 6, 5, 4, 3, 2);
+XPT2046_Touchscreen Touch(T_CS, T_IRQ);
+TS_Point TP;
 
 // step 2 create the objects
 //SliderH Red(&Display, left, top, width, bar color, back color, ball color);
@@ -101,9 +157,9 @@ void setup() {
   // fire up the display
   Display.begin();
 
-  // fire up the touch display
-  Touch.InitTouch(PORTRAIT);
-  Touch.setPrecision(PREC_EXTREME);
+  // fire up touch
+  Touch.begin();
+  Touch.setRotation(3); // you may need to adjust depending on your display 
 
   Display.invertDisplay(false);
   Display.fillScreen(C_BLACK);
@@ -142,7 +198,7 @@ void setup() {
 void loop() {
 
   // wait for touch
-  if (Touch.dataAvailable()) {
+  if (Touch.touched()) {
     ProcessTouch();
 
     // how to enable disable a slider
@@ -189,39 +245,22 @@ void loop() {
 
 void ProcessTouch() {
 
-  // depending on the touch library you may need to change methods here
-  Touch.read();
+    TP = Touch.getPoint();
+    BtnX = TP.x;
+    BtnY = TP.y;
 
-  BtnX = Touch.getX();
-  BtnY = Touch.getY();
+    //yellow headers
+    BtnX = map(BtnX, 3970, 307, 320, 0);
+    BtnY = map(BtnY, 3905, 237, 240, 0);
 
-  // consistency between displays is a mess...
-  // this is some debug code to help show
-  // where you pressed and the resulting map
+    //black headers
+    //BtnX  = map(BtnX, 0, 3905, 320, 0);
+    //BtnY  = map(BtnY, 0, 3970, 240, 0);
 
-  //Serial.print("real coordinates: ");
-  //Serial.print(BtnX);
-  //Serial.print(",");
-  //Serial.println (BtnY);
-  // Display.drawPixel(BtnX, BtnY, C_RED);
-
-  //different values depending on where touch happened
-
-  // x  = map(x, real left, real right, 0, 480);
-  // y  = map(y, real bottom, real top, 320, 0);
-
-  // tft with yellow headers
-  //BtnX  = map(BtnX, 240, 0, 320, 0);
-  //BtnY  = map(BtnY, 379, 0, 240, 0);
-
-  // tft with black headers
-  BtnX  = map(BtnX, 0, 240, 320, 0);
-  BtnY  = map(BtnY, 0, 380, 240, 0);
-
-  //Serial.print(", Mapped coordinates: ");
-  //Serial.print(BtnX);
-  //Serial.print(",");
-  //Serial.println(BtnY);
-  //Display.drawPixel(BtnX, BtnY, C_GREEN);
+  Serial.print(", Mapped coordinates: ");
+  Serial.print(BtnX);
+  Serial.print(",");
+  Serial.println(BtnY);
+  Display.fillCircle(BtnX, BtnY, 2, C_GREEN);
 
 }
