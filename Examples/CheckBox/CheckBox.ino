@@ -39,8 +39,6 @@
 #include <font_Arial.h>
 
 #define FONT Arial_16
-#define TFT_DC  9
-#define TFT_CS 10
 
 #define LONG_PRESS_DURATION 1000
 #define NO_PRESS 0
