@@ -34,12 +34,10 @@
 */
 
 #include <ILI9341_t3.h>           // fast display driver lib
-#include "UTouch.h"               // touchscreen lib
+#include <XPT2046_Touchscreen.h>
 // step 1 include the library
 #include <ILI9341_t3_Controls.h>  // custom control define file
 #include <font_Arial.h>
-#include <Colors.h>
-
 
 #define FONT Arial_16
 #define TFT_DC  9
@@ -59,6 +57,22 @@
 #define TFT_DC 9       // DC pin on LCD
 #define TFT_CS 10      // chip select pin on LCD
 #define LCD_PIN A9     // lcd pin to control brightness
+#define T_CS      0
+#define T_IRQ     1
+
+#define C_WHITE       0xFFFF
+#define C_BLACK       0x0000
+#define C_GREY        0xC618
+#define C_BLUE        0x001F
+#define C_RED         0xF800
+#define C_GREEN       0x07E0
+#define C_CYAN        0x07FF
+#define C_MAGENTA     0xF81F
+#define C_YELLOW      0xFFE0  
+#define C_TEAL      0x0438       
+#define C_ORANGE        0xDC00          
+#define C_PINK          0xF81F
+#define C_PURPLE    0x801F
 
 #define OUTLINECOLOR  C_GREY
 #define CHECKEDCOLOR      C_GREEN
@@ -71,9 +85,8 @@ int BtnX, BtnY;
 // create the display object
 ILI9341_t3 Display(TFT_CS, TFT_DC);
 
-// create the touch screen object
-// UTouch(byte tclk, byte tcs, byte tdin, byte dout, byte irq);
-UTouch  Touch( 6, 5, 4, 3, 2);
+XPT2046_Touchscreen Touch(T_CS, T_IRQ);
+TS_Point TP;
 
 // Step 2 create an object for each check box
 CheckBox CB1(&Display);
@@ -99,9 +112,10 @@ void setup() {
   // fire up the display
   Display.begin();
 
-  // fire up the touch display
-  Touch.InitTouch(PORTRAIT);
-  Touch.setPrecision(PREC_EXTREME);
+  // fire up touch
+  Touch.begin();
+  Touch.setRotation(3); // this may need to be adjusted depending on your display
+  
   Display.invertDisplay(false);
 
   Display.setRotation(1);
@@ -111,7 +125,7 @@ void setup() {
 
   Display.fillScreen(C_BLACK);
 
-  Display.fillRect(0, 0, 480, 50, C_DKBLUE);
+  Display.fillRect(0, 0, 480, 50, C_BLUE);
   Display.setTextColor(C_WHITE);
   Display.setFont(Arial_24);
   Display.setCursor(10 , 10 );
@@ -129,7 +143,7 @@ void setup() {
 
 void loop() {
 
-  if (Touch.dataAvailable()) {
+  if (Touch.touched()) {
     ProcessTouch();
 
     // Step 5 upon press of the checkbox process accordingly
@@ -201,39 +215,30 @@ void loop() {
 // my code uses global button x and button y locations
 void ProcessTouch() {
 
-  // depending on the touch library you may need to change methods here
-  Touch.read();
 
-  BtnX = Touch.getX();
-  BtnY = Touch.getY();
+  TP = Touch.getPoint();
+  BtnX = TP.x;
+  BtnY = TP.y;
 
   // consistency between displays is a mess...
   // this is some debug code to help show
   // where you pressed and the resulting map
 
-  //Serial.print("real coordinates: ");
-  //Serial.print(BtnX);
-  //Serial.print(",");
-  //Serial.println (BtnY);
-  // Display.drawPixel(BtnX, BtnY, C_RED);
-
-  //different values depending on where touch happened
-
   // x  = map(x, real left, real right, 0, 480);
   // y  = map(y, real bottom, real top, 320, 0);
 
-  // tft with yellow headers
-  //BtnX  = map(BtnX, 240, 0, 320, 0);
-  //BtnY  = map(BtnY, 379, 0, 240, 0);
+  //yellow headers
+  BtnX = map(BtnX, 3970, 307, 320, 0);
+  BtnY = map(BtnY, 3905, 237, 240, 0);
 
-  // tft with black headers
-  BtnX  = map(BtnX, 0, 240, 320, 0);
-  BtnY  = map(BtnY, 0, 380, 240, 0);
+  //black headers
+  //BtnX  = map(BtnX, 0, 3905, 320, 0);
+  //BtnY  = map(BtnY, 0, 3970, 240, 0);
 
-  //Serial.print(", Mapped coordinates: ");
-  //Serial.print(BtnX);
-  //Serial.print(",");
-  //Serial.println(BtnY);
-  //Display.drawPixel(BtnX, BtnY, C_GREEN);
+  Serial.print(", Mapped coordinates: ");
+  Serial.print(BtnX);
+  Serial.print(",");
+  Serial.println(BtnY);
+  Display.fillCircle(BtnX, BtnY, 2, C_GREEN);
 
 }
