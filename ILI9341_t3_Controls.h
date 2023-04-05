@@ -31,6 +31,7 @@ rev		date			author				change
 5.4		12/2021			kasprzak			added ring sliders 
 5.5 	11/2022			kasprzak			added better text centering control
 6.0 	2/2023			kasprzak			added support for icons on buttons
+6.1 	4/2023			kasprzak			added support for setting pressed fill and outline color
 */
 
 
