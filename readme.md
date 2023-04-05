@@ -1,4 +1,4 @@
-<b><h2><center>Version 6.0 updated 2/18/2023</center></h1></b>
+<b><h2><center>Version 6.1 updated 4/4/2023</center></h1></b>
 1. added support for setting fill and outline for pressed button color
 
 <b><h2><center>Version 6.0 updated 2/18/2023</center></h1></b>
