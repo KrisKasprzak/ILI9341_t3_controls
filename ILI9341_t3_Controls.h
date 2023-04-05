@@ -602,6 +602,8 @@ public:
 		outlinecolor = OutlineColor;
 		fillcolor = ButtonColor;
 		textcolor = TextColor;
+		pressedcolor = OutlineColor;
+		pressedoutlinecolor = OutlineColor;
 		backcolor = BackgroundColor;
 		disablecolorfill = C_DISABLE_LIGHT;
 		disablecolortext = C_DISABLE_DARK;
@@ -626,8 +628,8 @@ public:
 	// color 565 icon, no text
 
 	void init(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonWidth, uint8_t ButtonHeight,
-		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t TextColor, uint16_t BackgroundColor,
-		const uint16_t  *UpIcon, int16_t IconWidth, int16_t IconHeight, int OffsetLeft, int OffsetTop ) {
+		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t TextColor, 
+		const uint16_t *UpIcon,	const uint16_t  *DnIcon, int16_t IconWidth, int16_t IconHeight, int OffsetLeft, int OffsetTop ) {
 
 		x = ButtonX;
 		y = ButtonY;
@@ -635,7 +637,9 @@ public:
 		h = ButtonHeight;
 		outlinecolor = OutlineColor;
 		fillcolor = ButtonColor;
-		backcolor = BackgroundColor;
+		pressedcolor = OutlineColor;
+		pressedoutlinecolor = OutlineColor;
+		backcolor = 0;
 		disablecolorfill = C_DISABLE_LIGHT;
 		disablecolortext = C_DISABLE_DARK;
 		x_offset = OffsetLeft;
@@ -644,6 +648,7 @@ public:
 		Has565Icon = true;
 		HasMonoIcon = false;
 		upicon = UpIcon;
+		dnicon = DnIcon;
 		iconw = IconWidth;
 		iconh = IconHeight;
 		bt = 4;
@@ -670,6 +675,9 @@ public:
 		outlinecolor = OutlineColor;
 		fillcolor = ButtonColor;
 		textcolor = TextColor;
+		pressedcolor = OutlineColor;
+		pressedoutlinecolor = OutlineColor;
+		
 		backcolor = BackgroundColor;
 		disablecolorfill = C_DISABLE_LIGHT;
 		disablecolortext = C_DISABLE_DARK;
@@ -711,8 +719,8 @@ public:
 			}
 
 			drawit = false;
-			fill =  outlinecolor;
-			outline = outlinecolor;
+			fill =  pressedcolor;
+			outline = pressedoutlinecolor;
 			text = textcolor;
 		}
 
@@ -772,7 +780,6 @@ public:
 			d->print(label);
 		}
 		else {
-
 			if (!inverted) {
 				if (enabled) {
 					if (Has565Icon){
@@ -784,7 +791,7 @@ public:
 				}
 				else {
 					if (Has565Icon){
-						draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, upicon, iconw, iconh );
+								draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, dnicon, iconw, iconh );
 					}
 					else if (HasMonoIcon){
 						drawMonoBitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, monoicon, iconh, iconw, text );
@@ -792,23 +799,20 @@ public:
 				}
 			}
 			else {
-
-					if (Has565Icon){
-						draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, upicon, iconw, iconh );
-					}
-					else if (HasMonoIcon){
-						drawMonoBitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, monoicon, iconh, iconw, text );
-					}
+				if (Has565Icon){
+					draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, dnicon, iconw, iconh );
+				}
+				else if (HasMonoIcon){
+					drawMonoBitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, monoicon, iconh, iconw, text );
+				}
 			}
 		}
-
-				
+			
 	}
 
 	bool press(int16_t ScreenX, int16_t ScreenY) {
 
 		if ((!enabled) || (!visible)) {
-			//delay(debounce);
 			return false;
 		}	
 
@@ -818,7 +822,7 @@ public:
 		if ((ScreenY < (y - h/2)) || (ScreenY > (y + h/2))) {
 			return false;
 		}
-		//delay(debounce);	
+
 		return true;
 
 	}
@@ -856,9 +860,6 @@ public:
 
 
 	void resize(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonW, uint8_t ButtonH) {
-		//hide();
-		//draw();
-		//show();
 		x = ButtonX;
 		y = ButtonY;
 		w = ButtonW;
@@ -897,6 +898,11 @@ public:
 		bt = BorderThickness;
 	}
 	
+	void setPressedColor(uint16_t PressedColor, uint16_t PressedOutlineColor) {
+		pressedcolor = PressedColor;
+		pressedoutlinecolor = PressedOutlineColor;
+	}
+	
 	bool isEnabled() { 
 		return enabled;
 	}
@@ -916,20 +922,16 @@ private:
 	ILI9341_t3 *d;
 	ILI9341_t3_font_t f;
 	
-	void draw565Bitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h) {
-
-	  uint32_t offset = 0;
-
-	  int j, i;
-
-	  for (i = 0; i < h; i++) {
-		for (j = 0; j < w; j++) {
-		  d->drawPixel(j + x, i + y, bitmap[offset]);
-		  offset++;
+	 void draw565Bitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h) {
+		uint32_t offset = 0;
+		int j, i;
+		for (i = 0; i < h; i++) {
+			for (j = 0; j < w; j++) {
+			  d->drawPixel(j + x, i + y, pgm_read_word_near(bitmap + offset));
+			  offset++;
+			}
 		}
-	  }
-
-	}
+	} 
 	
 	void drawMonoBitmap(uint16_t x, uint16_t y, const unsigned char *bitmap, uint8_t w, uint8_t h, uint16_t color) {
 
@@ -953,7 +955,7 @@ private:
 	int16_t x_offset, y_offset;
 	int16_t iconh, iconw;
 	bool redraw;
-	uint16_t outlinecolor, fillcolor, textcolor, backcolor, disablecolorfill, disablecolortext;
+	uint16_t pressedcolor, pressedoutlinecolor, outlinecolor, fillcolor, textcolor, backcolor, disablecolorfill, disablecolortext;
 	char label[20];
 	bool Has565Icon;
 	bool HasMonoIcon;
