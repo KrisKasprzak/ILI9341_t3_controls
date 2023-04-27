@@ -732,8 +732,8 @@ public:
 		if (!enabled) {
 
 			if (ct == CORNER_AUTO){
-				d->fillRoundRect(x - (w/2)+(bt/2), y - (h/2)+(bt/2), w-bt, h-bt, min(w,h)/4, disablecolorfill);
-				d->drawRoundRect(x - (w/2)+(bt/2), y - (h/2)+(bt/2), w-bt, h-bt, min(w,h)/4-(bt/2), disablecolortext);
+				d->fillRoundRect(x - (w/2)+(bt/2), y - (h/2)+(bt/2), w-bt, h-bt, min(w,h)/4, disablecolortext);
+				d->drawRoundRect(x - (w/2)+(bt/2), y - (h/2)+(bt/2), w-bt, h-bt, min(w,h)/4-(bt/2), disablecolorfill);
 			}
 			else if(ct == CORNER_SQUARE) {
 				d->fillRect(x - (w/2), y - (h/2), w, h, disablecolorfill);
