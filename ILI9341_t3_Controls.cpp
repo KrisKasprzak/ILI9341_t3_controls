@@ -21,17 +21,17 @@
   On a personal note, if you develop an application or product using this library 
   and make millions of dollars, I'm happy for you!
 
-	rev		date			author				change
-	1.0		9/2019			kasprzak			initial code
-	2.0		9/2020			kasprzak			added shapes and sizes for handles
-	3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-	4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-	5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-	5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-	5.4		12/2021			kasprzak			added ring sliders 
-	5.5 		11/2022			kasprzak			added better text centering control
-	5.6 		1/2023			kasprzak			added icons for buttons
-	6.0 	2/2023			kasprzak			added support for icons on buttons
+	rev	date		author		change
+	1.0	9/2019		kasprzak	initial code
+	2.0	9/2020		kasprzak	added shapes and sizes for handles
+	3.0	10/2020		kasprzak	fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+	4.0	11/2020		kasprzak	fixed bugs added Button, Checkbox, OptionButton classes
+	5.0	11/2020		kasprzak	modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+	5.1	11/2020		kasprzak	added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+	5.4	12/2021		kasprzak	added ring sliders 
+	5.5 	11/2022		kasprzak	added better text centering control
+ 	6.1 	9/2023		kasprzak	added offset for legend
+	
 */
 
 
@@ -372,9 +372,10 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 	sxs = true;
 	sys = true;
 	
-	XScaleOffset = 20;
+	XScaleOffset = 5;
 	YScaleOffset = 40;
 	XTextScale = 1.0;
+	YlegendOffset = 0;
 
 	Delta = XHigh - XLow;
 
@@ -405,6 +406,13 @@ void CGraph::setX(float xpoint){
 
 		x = xpoint;
 
+}
+
+
+void CGraph::setYLegendOffset(int val){
+	
+	YlegendOffset = val;
+	
 }
 
 void CGraph::showAxisLabels(bool val){
@@ -526,7 +534,6 @@ void CGraph::drawLegend(byte Location){
 void CGraph::drawGraph() {
 
 	RedrawGraph = false;
-	byte to = 0;
 
 	float xDiv =  ((XHigh-XLow)/XInc);
 	float yDiv = ((YHigh-YLow)/YInc);
@@ -569,20 +576,8 @@ void CGraph::drawGraph() {
 
 		//get text offsets
 
-
-		if (XLow+(XInc*j) < 10){
-			to = 3;
-		}
-		else if (XLow+(XInc*j) < 100) {
-			to = 7;
-		}
-		else if (XLow+(XInc*j) < 1000){
-			to = 11;
-		}
-
 		if (sxs){
 			dtostrf((XLow+(XInc*j)) * XTextScale, 0, XDec,text);
-			//d->setCursor(gx + (j * xlen) - to, gy+XScaleOffset);
 			
 			d->setCursor(gx + (j * xlen)- (d->measureTextWidth(text)/2), gy+XScaleOffset);
 			
@@ -648,7 +643,7 @@ void CGraph::drawGraph() {
 
     	// draw x label
 		d->setTextColor(tc, bc);
-		d->setCursor(gx,gy+ TextHeight+5);	
+		d->setCursor(gx,gy+ TextHeight + 5);	
 		d->print(xatitle);
 
 		//Serial.println(xatitle);
@@ -664,21 +659,15 @@ void CGraph::drawGraph() {
 			StartPointY = gy - gh;
 		}
 		else if (tl == LOCATION_BOTTOM) {
-			//StartPointY = d->getCursorY() +13;
-			StartPointY = gy+ TextHeight+5;	
+			StartPointY = gy+ TextHeight + YlegendOffset;	
 		}
 
 		for (k = 0; k <= ID; k++){
 			d->setCursor(StartPointX, StartPointY);
 			d->print(dl[k]);
 			StartPointX = d->getCursorX();
-			
-			for (j= 0; j < pdia[k]; j++){
-				d->drawFastHLine(StartPointX+3, StartPointY+TextHeight/4 + j , 20, dc[k]);
-				//d->drawFastHLine(StartPointX+3, StartPointY+TextHeight/4 , 20, dc[k]);
-				//d->drawFastHLine(StartPointX+3, StartPointY+TextHeight/4 + 1, 20, dc[k]);
-			
-			}
+			d->fillRect(StartPointX+3, StartPointY+TextHeight/4 , 20, linet[k], dc[k]);
+
 			StartPointX += 30;
 		}
 		
