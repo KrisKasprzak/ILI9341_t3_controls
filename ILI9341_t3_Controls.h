@@ -21,16 +21,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 On a personal note, if you develop an application or product using this library
 and make millions of dollars, I'm happy for you!
 
-rev	date		author		change
-1.0	9/2019		kasprzak	initial code
-2.0	9/2020		kasprzak	added shapes and sizes for handles
-3.0	10/2020		kasprzak	fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-4.0	11/2020		kasprzak	fixed bugs added Button, Checkbox, OptionButton classes
-5.0	11/2020		kasprzak	modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-5.1	11/2020		kasprzak	added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-5.4	12/2021		kasprzak	added ring sliders 
-5.5 	11/2022		kasprzak	added better text centering control
-6.1 	9/2023		kasprzak	added offset for legend
+rev		date			author				change
+1.0		9/2019			kasprzak			initial code
+2.0		9/2020			kasprzak			added shapes and sizes for handles
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
+5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+5.4		12/2021			kasprzak			added ring sliders 
+5.5 	11/2022			kasprzak			added better text centering control
 */
 
 
@@ -202,6 +201,8 @@ public:
 	void setBarColor(uint16_t val = 0xF800);
 
 	void draw(float val);
+	
+	void refresh();
 
 	void setScale(float ScaleLow, float ScaleHigh, float ScaleInc);
 
