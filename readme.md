@@ -1,5 +1,6 @@
 <b><h2><center>Version 6.1 updated 4/4/2023</center></h1></b>
 1. added support for setting fill and outline for pressed button color
+2. added support for legend offset
 
 <b><h2><center>Version 6.0 updated 2/18/2023</center></h1></b>
 1. added support for icons on buttons (color545 and mono)
