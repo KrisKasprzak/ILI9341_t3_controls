@@ -33,14 +33,19 @@
 	
 */
 
+
 #include "ILI9341_t3_Controls.h"
 #include <ILI9341_t3.h>     // fast display driver lib
+
+
 
 float degtorad = .0174532778;
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 horizontal bar chart
+
 
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -218,6 +223,76 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	
 }
 
+
+void BarChartV::draw(float val){
+
+  if (redraw == true) {
+	redraw = false;
+
+	if (ss) {
+		d->setFont(sf);
+		stepval = (High - Low) / Inc;
+		
+		// paint over previous y scale
+		d->fillRect(gx + gw, gy - gh - 15, 70, gh + 30, bc);
+		d->setTextColor(tc, bc);
+		for (i = 0; i <= stepval; i++) {
+			
+			TempY =  gy - ((gh / stepval) * i);
+
+			d->drawFastHLine(gx + gw , TempY,  5, tc);
+			data = Low + (Inc * i);
+			// draw lables
+	 
+			if (Inc < .1) {
+				Dec = 3;
+			}
+			else  if (Inc < 1) {
+				Dec = 2;
+			}
+			else  if (Inc < 10) {
+				Dec = 1;
+			}
+			else   {
+				Dec = 0;
+			}
+
+			dtostrf(data, 0, Dec,text);
+			tLen = d->strPixelLen(text) * 1.2;
+			tHi =sf.cap_height;
+			d->setCursor(gx + gw + 12, TempY - (tHi / 2) );
+			d->print(text);
+		}
+	}
+	if (st){
+		d->setTextColor(tc, bc);
+		d->setFont(tf);
+		tHi =sf.cap_height * 2 + 5;
+		d->setCursor(gx , gy - gh -tHi );
+		d->print(ti);
+	}
+  }
+  // compute level of bar graph that is scaled to the  height and the hi and low vals
+  // this is needed to accompdate for +/- range
+  	if (val >= High) {
+		val = High;
+	}
+	if (val <= Low) {
+		val = Low;
+	}
+  level = (gh * (((val - Low) / (High - Low))));
+
+   
+  // draw the bar graph
+  // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+
+  d->fillRect(gx+1, gy - gh, gw - 2, gh - level, ac);
+  d->fillRect(gx+1, gy - level , gw - 2,  level, rc);
+  d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
+
+}
+
+/*
 void BarChartV::draw(float val){
 
   if (redraw == true) {
@@ -230,8 +305,9 @@ void BarChartV::draw(float val){
 
 	if (ss) {
 		d->setFont(sf);
-		stepval = MapFloat( Inc,Low, High,gh - gh, gh);
-	
+		stepval = MapFloat( Inc,Low, High,gy - gh, gy);
+		//stepval = MapFloat(y, YHigh, YLow, gy - gh, gy);
+	Serial.print("239: "); Serial.println(stepval); 
 		// paint over previous y scale
 		d->fillRect(gx + gw, gy - gh - 15, 70, gh + 30, bc);
 		d->setTextColor(tc, bc);
@@ -239,7 +315,7 @@ void BarChartV::draw(float val){
 			TempY =  gy - gh + i;
 			d->drawFastHLine(gx + gw , TempY,  5, tc);
 			// draw lables
-     
+     //Serial.print("247: "); Serial.println(TempY); 
 			if (High < .1) {
 				Dec = 3;
 			}
@@ -287,6 +363,8 @@ void BarChartV::draw(float val){
   d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
 
 }
+*/
+
 
 void BarChartV::refresh(){
 	
