@@ -73,6 +73,8 @@ rev		date			author				change
 #define DISABLED 0
 #define ENABLED 1
 
+#define MAX_GRAPHS 10
+
 /*
 #define	C_BLACK   		0x0000
 #define	C_BLUE    		0x001F
