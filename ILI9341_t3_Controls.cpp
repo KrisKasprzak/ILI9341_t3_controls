@@ -460,13 +460,13 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 	RedrawGraph = true;
 
 	TextHeight = tf.cap_height;
-
+	ID = 0;
 	}
 
 int CGraph::add(const char *name, uint16_t color){
 	
 	// max number of plots is 10
-	if (ID >= 10){
+	if (ID >= MAX_GRAPHS){
 		return -1;
 	}
 	pdia[ID] = 0;
