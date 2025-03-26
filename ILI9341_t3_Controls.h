@@ -29,7 +29,8 @@ rev		date			author				change
 5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
 5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
 5.4		12/2021			kasprzak			added ring sliders 
-5.5 	11/2022			kasprzak			added better text centering control
+5.5 		11/2022			kasprzak			added better text centering control
+6.2 		3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
 */
 
 
@@ -37,7 +38,7 @@ rev		date			author				change
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
-#define  ILI9341_t3_CONTROLS_VER 6.1
+#define  ILI9341_t3_CONTROLS_VER 6.2
 
 #if ARDUINO >= 100
  #include "Arduino.h"
