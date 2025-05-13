@@ -31,6 +31,7 @@ rev		date			author				change
 5.4		12/2021			kasprzak			added ring sliders 
 5.5 		11/2022			kasprzak			added better text centering control
 6.2 		3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
+7.0 	11/2022			kasprzak			added bar segment option for horizontal and vertical bar gauges
 */
 
 
@@ -38,7 +39,7 @@ rev		date			author				change
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
-#define  ILI9341_t3_CONTROLS_VER 6.2
+#define  ILI9341_t3_CONTROLS_VER 7.0
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -147,17 +148,25 @@ public:
 
 	void init(float GraphXLoc, float GraphYLoc, float GraphWidth, float GraphHeight, float ScaleLow, float ScaleHigh, float ScaleInc, const char *Title, uint16_t TextColor, uint16_t BorderColor, uint16_t BarColor, uint16_t BarBColor, uint16_t BackColor,const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &ScaleFont );
 
+	void showScale(bool val);
+
 	void setBarColor(uint16_t val = 0xF800);
 
 	void draw(float val);
 
-	void setScale(float ScaleLow, float ScaleHigh, float ScaleInc);
+	void setScale(float ScaleLow, float ScaleHigh, float ScaleInc);	
 
 	void showTitle(bool val);
-
-	void showScale(bool val);
-
 	
+	// allows bar segments as opposed to one large block, construct the object then override with these methods
+	
+	void useSegmentBars(bool val);
+	void setBars(float BarInc, uint8_t DividerSize);
+	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
+	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
+	void setSectionSize(float Divider1, float Divider2);
+	float getBars();
+	float getBarHeight();
 
 
 private:
@@ -176,12 +185,22 @@ private:
 		float	Low;
 		float	High;
 		float	Inc;
-
+		uint16_t	bars = 0;
+		uint16_t barwidth = 0;
+		uint16_t barcolor = 0;
+		uint8_t	divider = 0;
 		float	gx;
 		float	gy;
 		float	gw;
 		float	gh;
-
+		uint16_t color_l = 0;
+		uint16_t color_m = 0;
+		uint16_t color_h = 0;
+		uint16_t color_v = 0;
+		bool bartype = false;
+		float divider_1= 0.0f;
+		float divider_2= 0.0f;
+		uint16_t cnt = 0;
 		uint16_t tc;
 		uint16_t oc;
 		uint16_t rc;
@@ -212,6 +231,15 @@ public:
 	void showTitle(bool val);
 
 	void showScale(bool val);
+	
+	// allows bar segments as opposed to one large block, construct the object then override with these methods
+	void useSegmentBars(bool val);
+	void setBars(float BarInc, uint8_t DividerSize);
+	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
+	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
+	void setSectionSize(float Divider1, float Divider2);
+	float getBars();
+	float getBarHeight();
 
 private:
 
@@ -230,7 +258,18 @@ private:
 		float	Low;
 		float	High;
 		float	Inc;
-
+		uint16_t	bars = 0;
+		uint8_t barheight = 0;
+		uint16_t barcolor = 0;
+		uint8_t	divider = 0;
+		uint16_t color_l = 0;
+		uint16_t color_m = 0;
+		uint16_t color_h = 0;
+		uint16_t color_v = 0;
+		bool bartype = false;
+		float divider_1= 0.0f;
+		float divider_2= 0.0f;
+		uint16_t cnt = 0;
 		float	gx;
 		float	gy;
 		float	gw;
@@ -245,8 +284,6 @@ private:
 		float stepval, range, TempY, level, i, data;
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 };
-
-
 
 class CGraph {
 
