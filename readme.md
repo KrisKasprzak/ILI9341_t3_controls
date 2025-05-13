@@ -1,3 +1,6 @@
+<b><h2><center>Version 7.0 updated 5/13/2025</center></h1></b>
+1. added support for individual bar segments in BarGraphH and BarGraphV (kind of a UV meter look)
+
 <b><h2><center>Version 6.1 updated 4/4/2023</center></h1></b>
 1. added support for setting fill and outline for pressed button color
 2. added support for legend offset
@@ -11,10 +14,8 @@
 <b><h2><center>Version 5.4 updated 12/20/2021</center></h1></b>
 1. Added a ring slider
 
-
 <b><h2><center>Version 5.31	updated 4/7/2021</center></h1></b>
 1. Fixed snap issue in horizontal slider and draw issue with double triangle in horizontal slider
-
 
 <b><h2><center>Version 5.3 updated 4/7/2021</center></h1></b>
 1. added code to redraw changed handles, where handle size with setHandleSize(val), or shape with setHandleShape(val), was changed after the init(). Classic use case is where a triangle handle is to be used for low values, a square for high values. Note if handle color is changed dynamically, just call draw(and the value).
