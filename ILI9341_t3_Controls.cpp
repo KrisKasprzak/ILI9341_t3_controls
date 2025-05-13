@@ -20,24 +20,12 @@
 
   On a personal note, if you develop an application or product using this library 
   and make millions of dollars, I'm happy for you!
-
-	rev		date			author				change
-	1.0		9/2019			kasprzak			initial code
-	2.0		9/2020			kasprzak			added shapes and sizes for handles
-	3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-	4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-	5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-	5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-	5.4		12/2021			kasprzak			added ring sliders 
-	5.5 	11/2022			kasprzak			added better text centering control
 	
 */
 
 
 #include "ILI9341_t3_Controls.h"
 #include <ILI9341_t3.h>     // fast display driver lib
-
-
 
 float degtorad = .0174532778;
 
@@ -62,11 +50,17 @@ void BarChartH::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	High = ScaleHigh;
 	Inc = ScaleInc;
 	gx = GraphXLoc;
+
 	gy = GraphYLoc;
 	gw = GraphWidth;
 	gh = GraphHeight;
-	strncpy(ti, Title, 20);
-		
+	
+	divider = 1; // distance between bars (we are just going to reduce width)
+	bars = (High - ScaleLow) / ScaleInc;	
+	barwidth = gw / bars;	
+	
+	strncpy(ti, Title, MAXCHARLEN);
+	bartype = false;
 	tf = TitleFont;
 	sf = ScaleFont;
 	tc = TextColor;
@@ -80,99 +74,140 @@ void BarChartH::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 }
 
 void BarChartH::draw(float val){
+	
+	stepval = (High-Low) / Inc;
+		 
+	barwidth = gw / stepval;
+		
+	if (redraw == true) {
+		redraw = false;
+		   
 
-  if (redraw == true) {
-    redraw = false;
-	   
+		// step val basically scales the hival and low val to the height
+		// deducting a small value to eliminate round off errors
+		// this val may need to be adjusted
+		cnt = 0;
+		
+		if (ss){
+			
+			d->setFont(sf);
 
-    // step val basically scales the hival and low val to the height
-    // deducting a small value to eliminate round off errors
-    // this val may need to be adjusted
-	if (ss){
-		d->setFont(sf);
-		stepval = MapFloat(Inc, Low, High, 0, gw);
+			// paint over previous y scale
+			tHi = sf.cap_height * 2 + 8;
+			d->fillRect(gx-10, gy + gh + 1, gw+30, tHi, bc);
+			d->setTextColor(tc, bc);
 
-		// paint over previous y scale
-		tHi = sf.cap_height * 2 + 8;
-		d->fillRect(gx-10, gy + gh + 1, gw+30, tHi, bc);
-		d->setTextColor(tc, bc);
+			for (i = Low; i <= High; i += Inc) {
 
-		for (i = 0; i <= gw; i += stepval) {
+				d->drawFastVLine((cnt*barwidth) + gx, gy + gh+ 1,  5, tc);
+				// draw lables
+				if (High < .1) {
+					Dec = 3;
+				}
+				else  if (High <= 1) {
+					Dec = 2;
+				}
+				else  if (High <= 10) {
+					Dec = 1;
+				}
+				else   {
+					Dec = 0;
+				}
+				data =  i ;
 
-		d->drawFastVLine(i + gx, gy + gh+ 1,  5, tc);
-		// draw lables
-     		if (High < .1) {
-			Dec = 3;
+				dtostrf(data, 0, Dec,text);
+				tLen = d->strPixelLen(text) * 1.2;
+				tHi =sf.cap_height;
+				d->setCursor((cnt*barwidth) + gx - (tLen / 2) , gy + gh + 10);
+				cnt++;
+				d->print(text);
+			}
 		}
-		else  if (High <= 1) {
-			Dec = 2;
-		}
-		else  if (High <= 10) {
-			Dec = 1;
-		}
-		else   {
-			Dec = 0;
-		}
-		data =  i * (Inc / stepval);
 
-		dtostrf(data, 0, Dec,text);
-		tLen = d->strPixelLen(text) * 1.2;
-		tHi =sf.cap_height;
-		d->setCursor(i + gx - (tLen / 2) , gy + gh + 10);
-
-		d->print(text);
+		if(st){
+			d->setTextColor(tc, bc);
+			d->setFont(tf);
+			tHi = sf.cap_height * 2 + 12;
+			d->setCursor(gx , gy -tHi );
+			d->print(ti);
 		}
+
 	}
-
-	if(st){
-		d->setTextColor(tc, bc);
-		d->setFont(tf);
-		tHi = sf.cap_height * 2 + 8;
-		d->setCursor(gx , gy -tHi );
-		d->print(ti);
-	}
-
-  }
+	
 	// compute level of bar graph that is scaled to the  height and the hi and low vals
 
-	if (val >= High) {
-		val = High;
-	}
-	if (val <= Low) {
-		val = Low;
-	}
-
-	level = MapFloat( val, Low, High, gx, gx+gw);
 	
   // draw the bar graph
   // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+  
+  if (!bartype){
+	  
+		if (val >= High) {
+			val = High;
+		}
+		if (val <= Low) {
+			val = Low;
+		}
+	  level = MapFloat( val, Low, High, gx, gx+gw);
+
 	d->fillRect(level, gy + 1, gx+gw - level, gh - 2,ac);
 	d->fillRect(gx, gy + 1 , level - gx,  gh - 2, rc);
-
 	d->drawRect(gx , gy, gw, gh, oc);
+  }
+  else {
+	 stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	 
+	 barwidth = gw / bars;	 
+	for (i = 0; i < bars; i++){		
+
+		if (i <= (bars*divider_1)){
+			if (i < stepval){
+			barcolor = color_l;
+			}
+			else {
+				barcolor = color_v;
+			}
+		}
+		else if (i <= (bars*divider_2)){
+			if (i < stepval){
+			barcolor = color_m;
+			}
+			else {
+				barcolor = color_v;
+			}
+		}
+		else if (i <= (bars*1.0f)){
+			if (i < stepval){
+			barcolor = color_h;
+			}
+			else {
+				barcolor = color_v;
+			}
+		}
+		else {
+			barcolor = color_v;
+		}
+		
+		d->fillRect(gx + (i*barwidth), gy, barwidth - divider, gh,barcolor);
+	}
+
+  }
 
 }
 
-void BarChartH::setBarColor(uint16_t BarColor){
-	
-	rc = BarColor;
-		
+void BarChartH::setBarColor(uint16_t BarColor){	
+	rc = BarColor;		
 }
 
 
 void BarChartH::setScale(float ScaleLow, float ScaleHigh, float ScaleInc){
-
 	Low = ScaleLow;
 	High = ScaleHigh;
 	Inc = ScaleInc;
 	redraw = true;
-
 }
 
-void BarChartH::showTitle(bool val){
-	
-	st = val;
-		
+void BarChartH::showTitle(bool val){	
+	st = val;		
 }
 
 void BarChartH::showScale(bool val){
@@ -181,8 +216,39 @@ void BarChartH::showScale(bool val){
 		
 }
 
+void BarChartH::useSegmentBars(bool val){
+	bartype = val;
+}
+void BarChartH::setBars(float BarInc, uint8_t DividerSize){
+	divider = DividerSize;
+	bars = (High - Low) / BarInc;	
+	barwidth = gw / bars;		
+}
+void BarChartH::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV){	
+	color_l = ColorL;
+	color_m = ColorM;
+	color_h = ColorH;
+	color_v = ColorV;	
+}
+void BarChartH::setSectionSize(float Divider1, float Divider2){	
+	divider_1 = Divider1;
+	divider_2 = Divider2;
 
+}
+void BarChartH::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider){	
+	gx = Left;
+	gy = Top;
+	gw = Wide;
+	gh = High;
+	divider = Divider;	
+}
 
+float BarChartH::getBars(){	
+	return bars;
+}
+float BarChartH::getBarHeight(){	
+	return gh / bars;
+}
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -195,10 +261,8 @@ vertical bar chart
 BarChartV::BarChartV(ILI9341_t3 *Display){
 
 	d = Display;
-
 		
 }
-
 
 void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float GraphHeight, float ScaleLow, float ScaleHigh, float ScaleInc, const char *Title, uint16_t TextColor,uint16_t BorderColor, uint16_t BarColor, uint16_t BarBlankColor,uint16_t BackgroundColor, const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &ScaleFont ){
 
@@ -209,8 +273,12 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	gy = GraphYLoc;
 	gw = GraphWidth;
 	gh = GraphHeight;
-	strncpy(ti, Title, 20);
-		
+	strncpy(ti, Title, MAXCHARLEN);
+	bartype = false;
+	divider = 1; // distance between bars (we are just going to reduce width)
+	bars = (High - Low) / Inc;	
+	barheight = gh / bars;	
+	
 	tf = TitleFont;
 	sf = ScaleFont;
 	tc = TextColor;
@@ -219,152 +287,125 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	ac = BarBlankColor;
 	bc = BackgroundColor;
 	redraw = true;
-
 	
 }
 
 
 void BarChartV::draw(float val){
+	
+	stepval = (High-Low) / Inc;
+		 		
+	if (redraw == true) {
+		redraw = false;	   
 
-  if (redraw == true) {
-	redraw = false;
-
-	if (ss) {
-		d->setFont(sf);
-		stepval = (High - Low) / Inc;
+		// step val basically scales the hival and low val to the height
+		// deducting a small value to eliminate round off errors
+		// this val may need to be adjusted
+		cnt = 0;
 		
-		// paint over previous y scale
-		d->fillRect(gx + gw, gy - gh - 15, 70, gh + 30, bc);
-		d->setTextColor(tc, bc);
-		for (i = 0; i <= stepval; i++) {
+		if (ss) {
+			d->setFont(sf);
+			stepval = (High - Low) / Inc;
 			
-			TempY =  gy - ((gh / stepval) * i);
+			// paint over previous y scale
+			d->fillRect(gx + gw, gy - gh - 15, 70, gh + 30, bc);
+			d->setTextColor(tc, bc);
+			for (i = 0; i <= stepval; i++) {
+				
+				TempY =  gy - ((gh / stepval) * i);
 
-			d->drawFastHLine(gx + gw , TempY,  5, tc);
-			data = Low + (Inc * i);
-			// draw lables
-	 
-			if (Inc < .1) {
-				Dec = 3;
-			}
-			else  if (Inc < 1) {
-				Dec = 2;
-			}
-			else  if (Inc < 10) {
-				Dec = 1;
-			}
-			else   {
-				Dec = 0;
-			}
+				d->drawFastHLine(gx + gw , TempY,  5, tc);
+				data = Low + (Inc * i);
+				// draw lables
+		 
+				if (Inc < .1) {
+					Dec = 2;
+				}
+				else  if (Inc < 1) {
+					Dec = 1;
+				}
+				else  if (Inc < 10) {
+					Dec = 0;
+				}
+				else   {
+					Dec = 0;
+				}
 
-			dtostrf(data, 0, Dec,text);
-			tLen = d->strPixelLen(text) * 1.2;
-			tHi =sf.cap_height;
-			d->setCursor(gx + gw + 12, TempY - (tHi / 2) );
-			d->print(text);
+				dtostrf(data, 0, Dec,text);
+				tLen = d->strPixelLen(text) * 1.2;
+				tHi =sf.cap_height;
+				d->setCursor(gx + gw + 12, TempY - (tHi / 2) );
+				d->print(text);
+			}
+		}
+		if (st){
+			d->setTextColor(tc, bc);
+			d->setFont(tf);
+			tHi =sf.cap_height * 2 + 5;
+			d->setCursor(gx , gy - gh -tHi );
+			d->print(ti);
 		}
 	}
-	if (st){
-		d->setTextColor(tc, bc);
-		d->setFont(tf);
-		tHi =sf.cap_height * 2 + 5;
-		d->setCursor(gx , gy - gh -tHi );
-		d->print(ti);
-	}
-  }
-  // compute level of bar graph that is scaled to the  height and the hi and low vals
-  // this is needed to accompdate for +/- range
-  	if (val >= High) {
-		val = High;
-	}
-	if (val <= Low) {
-		val = Low;
-	}
-  level = (gh * (((val - Low) / (High - Low))));
-
-   
-  // draw the bar graph
-  // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
-
-  d->fillRect(gx+1, gy - gh, gw - 2, gh - level, ac);
-  d->fillRect(gx+1, gy - level , gw - 2,  level, rc);
-  d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
-
-}
-
-/*
-void BarChartV::draw(float val){
-
-  if (redraw == true) {
-	redraw = false;
-
-
-	// step val basically scales the hival and low val to the height
-	// deducting a small value to eliminate round off errors
-	// this val may need to be adjusted
-
-	if (ss) {
-		d->setFont(sf);
-		stepval = MapFloat( Inc,Low, High,gy - gh, gy);
-		//stepval = MapFloat(y, YHigh, YLow, gy - gh, gy);
-	Serial.print("239: "); Serial.println(stepval); 
-		// paint over previous y scale
-		d->fillRect(gx + gw, gy - gh - 15, 70, gh + 30, bc);
-		d->setTextColor(tc, bc);
-		for (i = 0; i <= gh; i += stepval) {
-			TempY =  gy - gh + i;
-			d->drawFastHLine(gx + gw , TempY,  5, tc);
-			// draw lables
-     //Serial.print("247: "); Serial.println(TempY); 
-			if (High < .1) {
-				Dec = 3;
-			}
-			else  if (High <= 1) {
-				Dec = 2;
-			}
-			else  if (High <= 10) {
-				Dec = 1;
-			}
-			else   {
-				Dec = 0;
-			}
-			data = High - ( i * (Inc / stepval));
-			dtostrf(data, 0, Dec,text);
-			tLen = d->strPixelLen(text) * 1.2;
-			tHi =sf.cap_height;
-			d->setCursor(gx + gw + 12, TempY - (tHi / 2) );
-			d->print(text);
+	// compute level of bar graph that is scaled to the  height and the hi and low vals
+	// this is needed to accompdate for +/- range
+	if (!bartype){
+		if (val >= High) {
+			val = High;
 		}
-	}
-	if (st){
-		d->setTextColor(tc, bc);
-		d->setFont(tf);
-		tHi =sf.cap_height * 2 + 5;
-		d->setCursor(gx , gy - gh -tHi );
-		d->print(ti);
-	}
-  }
-  // compute level of bar graph that is scaled to the  height and the hi and low vals
-  // this is needed to accompdate for +/- range
-  	if (val >= High) {
-		val = High;
-	}
-	if (val <= Low) {
-		val = Low;
-	}
-  level = (gh * (((val - Low) / (High - Low))));
+		if (val <= Low) {
+			val = Low;
+		}
+		level = (gh * (((val - Low) / (High - Low))));
 
-   
-  // draw the bar graph
-  // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+		// draw the bar graph
+		// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
 
-  d->fillRect(gx+1, gy - gh, gw - 2, gh - level, ac);
-  d->fillRect(gx+1, gy - level , gw - 2,  level, rc);
-  d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
+		d->fillRect(gx+1, gy - gh, gw - 2, gh - level, ac);
+		d->fillRect(gx+1, gy - level , gw - 2,  level, rc);
+		d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
+	}
+	else {
+		stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	 
+		bars = (High - Low) / Inc;	
+		barheight = gh / bars;		
+		
+		for (int i = 1; i <= bars; i++){		
 
+			if (i <= (bars*divider_1)){
+				if (i < stepval){
+				barcolor = color_l;
+				}
+				else {
+					barcolor = color_v;
+				}
+			}
+			else if (i <= (bars*divider_2)){
+				if (i < stepval){
+				barcolor = color_m;
+				}
+				else {
+					barcolor = color_v;
+				}
+			}
+			else if (i <= (bars*1.0)){
+				if (i < stepval){
+				barcolor = color_h;
+				}
+				else {
+					barcolor = color_v;
+				}
+			}
+			else {
+				barcolor = color_v;
+			}
+
+		
+			d->fillRect(gx , gy - (i*barheight) + divider, gw, barheight- divider, barcolor);
+
+		}		
+		
+	}
 }
-*/
-
 
 void BarChartV::refresh(){
 	
@@ -392,14 +433,47 @@ void BarChartV::showScale(bool val){
 
 
 void BarChartV::setScale(float ScaleLow, float ScaleHigh, float ScaleInc){
-
-
-		Low = ScaleLow;
-		High = ScaleHigh;
-		Inc = ScaleInc;
-		redraw = true;
+	Low = ScaleLow;
+	High = ScaleHigh;
+	Inc = ScaleInc;
+	redraw = true;
 }
 
+void BarChartV::useSegmentBars(bool val){
+	bartype = val;
+}
+void BarChartV::setBars(float BarInc, uint8_t DividerSize){
+	divider = DividerSize;
+	Inc = BarInc;
+	bars = (High - Low) / Inc;	
+	barheight = gh / bars;	
+
+}
+void BarChartV::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV){	
+	color_l = ColorL;
+	color_m = ColorM;
+	color_h = ColorH;
+	color_v = ColorV;	
+}
+void BarChartV::setSectionSize(float Divider1, float Divider2){	
+	divider_1 = Divider1;
+	divider_2 = Divider2;
+	
+}
+void BarChartV::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider){	
+	gx = Left;
+	gy = Top;
+	gw = Wide;
+	gh = High;
+	divider = Divider;	
+}
+
+float BarChartV::getBars(){	
+	return bars;
+}
+float BarChartV::getBarHeight(){	
+	return gh / bars;
+}
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
