@@ -138,7 +138,7 @@ rev		date			author				change
 #define C_DISABLE_LIGHT 0xC618
 #define C_DISABLE_MED	0x7BCF
 #define C_DISABLE_DARK	0x3186
-
+#define MAXCHARLEN 30
 
 class BarChartH {
 
