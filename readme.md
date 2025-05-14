@@ -30,6 +30,8 @@ While this library was created for the ILI9341_t3 and intended for Teensy-based 
 
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/BarChartH.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/BarChartV.jpg)
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/HBar.jpg)
+![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/VBar.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/CGraph.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Dial.jpg)
 ![header image](https://raw.github.com/KrisKasprzak/ILI9341_t3_controls/master/Equalizer.jpg)
