@@ -1,6 +1,6 @@
-<b><h2><center>Version 7.0 updated 5/13/2025</center></h1></b>
+<b><h2><center>Version 8.0 updated 5/20/2025</center></h1></b>
 1. added support for individual bar segments in BarGraphH and BarGraphV (kind of a UV meter look)
-
+2. added support for an arc shaped bar chart, BarGraphA (kind of a famcy UV meter look)
 <b><h2><center>Version 6.1 updated 4/4/2023</center></h1></b>
 1. added support for setting fill and outline for pressed button color
 2. added support for legend offset
