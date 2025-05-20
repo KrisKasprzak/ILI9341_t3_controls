@@ -32,6 +32,135 @@ float degtorad = .0174532778;
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+arc shaped bar chart
+
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+BarChartA::BarChartA(ILI9341_t3 *Display){
+
+	d = Display;
+		
+}
+
+
+void BarChartA::init(uint16_t ArcRadius, uint16_t ArcCenterX, uint16_t BarWidth, uint16_t OffsetFromTop, uint16_t SweepAngle, uint8_t Segments, float ScaleLow, float ScaleHigh){
+
+	rad = ArcRadius;
+	xoffset = ArcCenterX;
+	barwidth = BarWidth;
+	topoffset= OffsetFromTop;
+	sweepangle= SweepAngle;
+	segments= Segments;
+	low = ScaleLow;
+	high = ScaleHigh;
+
+}
+
+void BarChartA::draw(float Value){
+	
+	yoffset = rad + topoffset;
+	
+	// very weird but displays +y is down so as opposed to handling that transform when drawing
+	// i'm just rotating the draw transform coordinates by 270 degrees
+	// this works and still honors the dislay.setRotation(1-4)
+	// and as a result segment #0 is the clockwise most segment--hence we draw CW so reverse the draw order
+	startangle = (gap / 2) + ((270.0f + (sweepangle / 2.0f)) * degtorad);
+	arcangle = ((float)(sweepangle / (float)segments) * degtorad) - gap;
+  
+	for (i = segments; i > 0; i--) {
+		drawangle = ((float) startangle - ((float)arcangle + gap) * (float) i); 
+		p1x = ((rad)*cos(drawangle)) + xoffset;
+		p1y = ((rad)*sin(drawangle)) + yoffset;
+		p2x = ((rad - barwidth) * cos(drawangle)) + xoffset;
+		p2y = ((rad - barwidth) * sin(drawangle)) + yoffset;
+		p3x = ((rad - barwidth) * cos(drawangle + arcangle)) + xoffset;
+		p3y = ((rad - barwidth) * sin(drawangle + arcangle)) + yoffset;
+		p4x = ((rad)*cos(drawangle + arcangle)) + xoffset;
+		p4y = ((rad)*sin(drawangle + arcangle)) + yoffset;
+
+		// again another hack to get the colors drawing colockwise for increased Value
+		// due to CCW most segment is the max segment count, but lowest scaled value
+		tempval = MapFloat(Value, low, high, (float) segments + 1.0f, 0.0f);
+
+		if (i > (segments * (1 - divider_1))) {
+		  if (i > tempval) {
+			barcolor = color_l;
+		  } else {
+			barcolor = color_v;
+		  }
+		} else if (i > (segments * (1 - divider_2))) {
+		  if (i > tempval) {
+			barcolor = color_m;
+		  } else {
+			barcolor = color_v;
+		  }
+		} else {
+		  if (tempval < i) {
+			barcolor = color_h;
+		  } else {
+			barcolor = color_v;
+		  }
+		}
+		// display does not have a 4 point square so we're drawing 2 triangles
+		// luckily the overlap between the triangles leaves no stray pixels
+		d->fillTriangle(p1x, p1y, p2x, p2y, p3x, p3y, barcolor);
+		d->fillTriangle(p3x, p3y, p4x, p4y, p1x, p1y, barcolor);
+	}
+	
+}
+
+// wanna reset the scale?
+void BarChartA::setScale(float ScaleLow, float ScaleHigh){
+	
+	low = ScaleLow;
+	high = ScaleHigh;
+	
+}
+
+// need a different sweep angle, # of drawn segments, etc?
+void BarChartA::setBars(uint16_t SweepAngle, uint16_t Segments, uint16_t BarWidth, float GapSize){
+	
+	sweepangle= SweepAngle;
+	segments= Segments;
+	barwidth = BarWidth;
+	gap = GapSize;
+	
+}
+
+// default is low=green, med=yellow, high=red and null is dark grey, change with this method
+void BarChartA::setSectionColors(uint16_t ColorL, uint16_t ColorM, uint16_t ColorH, uint16_t ColorV){
+	
+	color_l= ColorL;
+	color_m= ColorM;
+	color_h = ColorH;	
+	color_v = ColorV;
+	
+}
+
+// default is 50 and 75% note Divider2 is not the difference from Divider2 but from 0. 
+void BarChartA::setSectionSize(float Divider1, float Divider2){
+	
+	divider_1= Divider1;
+	divider_2= Divider2;
+		
+}
+
+// internal map--I sure wish Arduino platform did NOT make map with long ints
+float BarChartA::MapFloat(float x, float in_min, float in_max, float out_min, float out_max) {
+
+  if (in_min < 0) {
+    in_max = in_max + abs(in_min);
+    in_min = 0.0;
+  }
+
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 horizontal bar chart
 
 
