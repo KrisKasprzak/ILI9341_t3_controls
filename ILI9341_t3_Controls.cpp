@@ -29,6 +29,7 @@
 
 float degtorad = .0174532778;
 
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -68,6 +69,19 @@ void BarChartA::draw(float Value){
 	startangle = (gap / 2) + ((270.0f + (sweepangle / 2.0f)) * degtorad);
 	arcangle = ((float)(sweepangle / (float)segments) * degtorad) - gap;
   
+  
+  	if (divider_1 < low){
+		divider_1 = low;
+	}
+
+	if (divider_2 > high){
+		divider_2 = high;
+	}
+
+	divider1 = map(divider_1, low, high, 0, bars);		
+	divider2 = map(divider_2, low, high, 0, bars);
+	
+	
 	for (i = segments; i > 0; i--) {
 		drawangle = ((float) startangle - ((float)arcangle + gap) * (float) i); 
 		p1x = ((rad)*cos(drawangle)) + xoffset;
@@ -83,13 +97,13 @@ void BarChartA::draw(float Value){
 		// due to CCW most segment is the max segment count, but lowest scaled value
 		tempval = MapFloat(Value, low, high, (float) segments + 1.0f, 0.0f);
 
-		if (i > (segments * (1 - divider_1))) {
+		if (i > (divider1)) {
 		  if (i > tempval) {
 			barcolor = color_l;
 		  } else {
 			barcolor = color_v;
 		  }
-		} else if (i > (segments * (1 - divider_2))) {
+		} else if (i > (divider2)) {
 		  if (i > tempval) {
 			barcolor = color_m;
 		  } else {
@@ -158,6 +172,7 @@ float BarChartA::MapFloat(float x, float in_min, float in_max, float out_min, fl
 }
 
 
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -205,8 +220,6 @@ void BarChartH::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 void BarChartH::draw(float val){
 	
 	stepval = (High-Low) / Inc;
-		 
-	barwidth = gw / stepval;
 		
 	if (redraw == true) {
 		redraw = false;
@@ -284,29 +297,41 @@ void BarChartH::draw(float val){
 	d->drawRect(gx , gy, gw, gh, oc);
   }
   else {
-	 stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	 
-	 barwidth = gw / bars;	 
-	for (i = 0; i < bars; i++){		
+	stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	 
+	
+	if (divider_1 < Low){
+		divider_1 = Low;
+	}
 
-		if (i <= (bars*divider_1)){
-			if (i < stepval){
-			barcolor = color_l;
+	if (divider_2 > High){
+		divider_2 = High;
+	}
+
+	divider1 = map(divider_1, Low, High, 0, bars);		
+	divider2 = map(divider_2, Low, High, 0, bars);
+		
+		
+	for (i = 1; i < bars; i++){		
+
+		if (i <= (divider1)){
+			if (i <= stepval){
+				barcolor = color_l;
 			}
 			else {
 				barcolor = color_v;
 			}
 		}
-		else if (i <= (bars*divider_2)){
-			if (i < stepval){
-			barcolor = color_m;
+		else if (i <= (divider2)){
+			if (i <= stepval){
+				barcolor = color_m;
 			}
 			else {
 				barcolor = color_v;
 			}
 		}
-		else if (i <= (bars*1.0f)){
-			if (i < stepval){
-			barcolor = color_h;
+		else if (i <= bars){
+			if (i <= stepval){
+				barcolor = color_h;
 			}
 			else {
 				barcolor = color_v;
@@ -316,7 +341,7 @@ void BarChartH::draw(float val){
 			barcolor = color_v;
 		}
 		
-		d->fillRect(gx + (i*barwidth), gy, barwidth - divider, gh,barcolor);
+		d->fillRect(gx + (i*(barwidth + divider)), gy, barwidth, gh,barcolor);
 	}
 
   }
@@ -325,6 +350,12 @@ void BarChartH::draw(float val){
 
 void BarChartH::setBarColor(uint16_t BarColor){	
 	rc = BarColor;		
+}
+
+void BarChartH::refresh(){
+	
+	redraw = true;
+		
 }
 
 
@@ -348,10 +379,10 @@ void BarChartH::showScale(bool val){
 void BarChartH::useSegmentBars(bool val){
 	bartype = val;
 }
-void BarChartH::setBars(float BarInc, uint8_t DividerSize){
+void BarChartH::setBars(float BarWidth, uint8_t DividerSize){
 	divider = DividerSize;
-	bars = (High - Low) / BarInc;	
-	barwidth = gw / bars;		
+	barwidth = BarWidth;	
+
 }
 void BarChartH::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV){	
 	color_l = ColorL;
@@ -362,8 +393,8 @@ void BarChartH::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t Color
 void BarChartH::setSectionSize(float Divider1, float Divider2){	
 	divider_1 = Divider1;
 	divider_2 = Divider2;
-
 }
+
 void BarChartH::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider){	
 	gx = Left;
 	gy = Top;
@@ -375,8 +406,8 @@ void BarChartH::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t Hig
 float BarChartH::getBars(){	
 	return bars;
 }
-float BarChartH::getBarHeight(){	
-	return gh / bars;
+float BarChartH::getActualWidth(){	
+	return (barwidth+divider) * bars;
 }
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -423,7 +454,9 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 void BarChartV::draw(float val){
 	
 	stepval = (High-Low) / Inc;
-		 		
+	
+
+
 	if (redraw == true) {
 		redraw = false;	   
 
@@ -494,30 +527,43 @@ void BarChartV::draw(float val){
 		d->drawRect(gx , gy - gh - 1 , gw, gh+2, oc);
 	}
 	else {
-		stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	 
-		bars = (High - Low) / Inc;	
-		barheight = gh / bars;		
+		
+		// calculations
+		bars = gh / (barheight+divider);
+
+		if (divider_1 < Low){
+		divider_1 = Low;
+		}
+
+		if (divider_2 > High){
+		divider_2 = High;
+		}
+
+		divider1 = map(divider_1, Low, High, 0, bars);		
+		divider2 = map(divider_2, Low, High, 0, bars);
+
+		stepval = MapFloat(val, Low, High, 0.0f, (float) bars);	
 		
 		for (int i = 1; i <= bars; i++){		
 
-			if (i <= (bars*divider_1)){
-				if (i < stepval){
+			if (i <= (divider1)){
+				if (i <= stepval){
 				barcolor = color_l;
 				}
 				else {
 					barcolor = color_v;
 				}
 			}
-			else if (i <= (bars*divider_2)){
-				if (i < stepval){
+			else if (i <= (divider2)){
+				if (i <= stepval){
 				barcolor = color_m;
 				}
 				else {
 					barcolor = color_v;
 				}
 			}
-			else if (i <= (bars*1.0)){
-				if (i < stepval){
+			else if (i <= bars){
+				if (i <= stepval){
 				barcolor = color_h;
 				}
 				else {
@@ -526,10 +572,8 @@ void BarChartV::draw(float val){
 			}
 			else {
 				barcolor = color_v;
-			}
-
-		
-			d->fillRect(gx , gy - (i*barheight) + divider, gw, barheight- divider, barcolor);
+			}		
+			d->fillRect(gx , gy - (i*(barheight + divider)), gw, barheight, barcolor);
 
 		}		
 		
@@ -571,12 +615,13 @@ void BarChartV::setScale(float ScaleLow, float ScaleHigh, float ScaleInc){
 void BarChartV::useSegmentBars(bool val){
 	bartype = val;
 }
-void BarChartV::setBars(float BarInc, uint8_t DividerSize){
-	divider = DividerSize;
-	Inc = BarInc;
-	bars = (High - Low) / Inc;	
-	barheight = gh / bars;	
 
+void BarChartV::setBars(uint8_t BarHeight, uint8_t DividerSize){
+	divider = DividerSize;
+	barheight = BarHeight;	
+	
+
+	
 }
 void BarChartV::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV){	
 	color_l = ColorL;
@@ -584,11 +629,14 @@ void BarChartV::setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t Color
 	color_h = ColorH;
 	color_v = ColorV;	
 }
+
 void BarChartV::setSectionSize(float Divider1, float Divider2){	
-	divider_1 = Divider1;
-	divider_2 = Divider2;
+	
+	divider_1 = Divider1;		
+	divider_2 = Divider2;		
 	
 }
+
 void BarChartV::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider){	
 	gx = Left;
 	gy = Top;
@@ -600,8 +648,8 @@ void BarChartV::setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t Hig
 float BarChartV::getBars(){	
 	return bars;
 }
-float BarChartV::getBarHeight(){	
-	return gh / bars;
+float BarChartV::getActualHeight(){	
+	return (barheight+divider) * bars;
 }
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
