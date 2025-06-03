@@ -21,19 +21,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 On a personal note, if you develop an application or product using this library
 and make millions of dollars, I'm happy for you!
 
-rev	date			author				change
-1.0	9/2019			kasprzak			initial code
-2.0	9/2020			kasprzak			added shapes and sizes for handles
-3.0	10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-4.0	11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-5.0	11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-5.1	11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-5.4	12/2021			kasprzak			added ring sliders 
-5.5 	11/2022			kasprzak			added better text centering control
-6.2 	3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
-7.0 	5/2025			kasprzak			added bar segment option for horizontal and vertical bar gauges
-7.0 	5/2025			kasprzak			added arc shape bar segment class
+rev		date			author				change
+1.0		9/2019			kasprzak			initial code
+2.0		9/2020			kasprzak			added shapes and sizes for handles
+3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
+5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+5.4		12/2021			kasprzak			added ring sliders 
+5.5 		11/2022			kasprzak			added better text centering control
+6.2 		3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
+7.0 		11/2022			kasprzak			added bar segment option for horizontal and vertical bar gauges
+8.0 		6/2025			kasprzak			added arc shape bar segment class and made segment bar charts dividers actual and no a percentage
 */
+
+
 
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
@@ -118,6 +120,10 @@ rev	date			author				change
 
 #define C_MDGREY      	0x7BCF
  */
+
+
+
+
 #define B_PRESSED true
 #define B_RELEASED false
 #define TFT_DEBOUNCE 100  // debounce delay to minimize screen repress
@@ -175,8 +181,12 @@ private:
 	uint16_t color_v = 0x52AA;
 	float divider_1= 0.5f;
 	float divider_2= 0.75f;
+	float divider1= 0.5f;
+	float divider2=  0.75f;
 	float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 };
+
+
 class BarChartH {
 
 public:
@@ -191,19 +201,24 @@ public:
 
 	void draw(float val);
 
+	void refresh();
+
 	void setScale(float ScaleLow, float ScaleHigh, float ScaleInc);	
+	
+	void setTitleText(const char *Title, const ILI9341_t3_font_t &TitleFont );	
 
 	void showTitle(bool val);
 	
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
 	
 	void useSegmentBars(bool val);
-	void setBars(float BarInc, uint8_t DividerSize);
+	void setBars(float BarWidth, uint8_t DividerSize);
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
+	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
-	float getBarHeight();
+	float getActualWidth();
 
 
 private:
@@ -222,6 +237,7 @@ private:
 		float	Low;
 		float	High;
 		float	Inc;
+		float	barinc;
 		uint16_t	bars = 0;
 		uint16_t barwidth = 0;
 		uint16_t barcolor = 0;
@@ -237,6 +253,8 @@ private:
 		bool bartype = false;
 		float divider_1= 0.0f;
 		float divider_2= 0.0f;
+		float divider1= 0.0f;
+		float divider2= 0.0f;
 		uint16_t cnt = 0;
 		uint16_t tc;
 		uint16_t oc;
@@ -271,12 +289,13 @@ public:
 	
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
 	void useSegmentBars(bool val);
-	void setBars(float BarInc, uint8_t DividerSize);
+	void setBars(uint8_t BarHeight, uint8_t DividerSize);
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
+	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
-	float getBarHeight();
+	float getActualHeight();
 
 private:
 
@@ -295,6 +314,7 @@ private:
 		float	Low;
 		float	High;
 		float	Inc;
+		float	barinc;
 		uint16_t	bars = 0;
 		uint8_t barheight = 0;
 		uint16_t barcolor = 0;
@@ -306,6 +326,8 @@ private:
 		bool bartype = false;
 		float divider_1= 0.0f;
 		float divider_2= 0.0f;
+		float divider1= 0.0f;
+		float divider2= 0.0f;
 		uint16_t cnt = 0;
 		float	gx;
 		float	gy;
