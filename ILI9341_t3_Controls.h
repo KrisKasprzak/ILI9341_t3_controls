@@ -216,7 +216,6 @@ public:
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
-	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
 	float getActualWidth();
 
@@ -293,7 +292,6 @@ public:
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
-	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
 	float getActualHeight();
 
