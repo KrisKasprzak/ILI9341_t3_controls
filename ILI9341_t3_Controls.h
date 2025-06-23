@@ -31,9 +31,9 @@ rev		date			author				change
 5.4		12/2021			kasprzak			added ring sliders 
 5.5 		11/2022			kasprzak			added better text centering control
 6.2 		3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
-7.0 		11/2022			kasprzak			added bar segment option for horizontal and vertical bar gauges
-8.0 		6/2025			kasprzak			added arc shape bar segment class and made segment bar charts dividers actual and no a percentage
-8.1 		6/2025			kasprzak			simplified bar segment api's
+7.0 	11/2022			kasprzak			added bar segment option for horizontal and vertical bar gauges
+8.0 	5/2025			kasprzak			added arc shape bar segment class
+
 */
 
 
@@ -41,7 +41,7 @@ rev		date			author				change
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
-#define  ILI9341_t3_CONTROLS_VER 8.1
+#define  ILI9341_t3_CONTROLS_VER 8.0
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -194,11 +194,7 @@ public:
 
 	BarChartH(ILI9341_t3 *Display);
 
-	// init for bar chart
 	void init(float GraphXLoc, float GraphYLoc, float GraphWidth, float GraphHeight, float ScaleLow, float ScaleHigh, float ScaleInc, const char *Title, uint16_t TextColor, uint16_t BorderColor, uint16_t BarColor, uint16_t BarBColor, uint16_t BackColor,const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &ScaleFont );
-	
-	// init for bar chart with segments
-	void init(float GraphXLoc, float GraphYLoc, float GraphHeight, float ScaleLow, float ScaleHigh, uint16_t NumberOfBars, float BarWidth, uint8_t DividerSize, const char *Title, uint16_t TextColor, uint16_t ColorLow, uint16_t ColorMed, uint16_t ColorHigh, uint16_t ColorNull,const ILI9341_t3_font_t &TitleFont );
 
 	void showScale(bool val);
 
@@ -216,9 +212,13 @@ public:
 	
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
 	
-	void setBars(uint16_t Left, uint16_t Top,uint8_t BarWidth, uint16_t NumberofBars,uint8_t DividerSize);
+	void useSegmentBars(bool val);
+	void setBars(float BarWidth, uint8_t DividerSize);
+	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
+	void setSectionSizeActual(float Divider1, float Divider2);
+	float getBars();
 	float getActualWidth();
 
 
@@ -227,7 +227,7 @@ private:
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
-		char	ti[20];
+		char	titxt[40];
 		char	sc[20];
 		char	cc[2] = "D";
 		char	text[30];
@@ -238,8 +238,8 @@ private:
 		float	Low;
 		float	High;
 		float	Inc;
-		float	barinc = 0;
-		uint16_t	bars = 0, stepval = 0;
+		float	barinc;
+		uint16_t	bars = 0;
 		uint16_t barwidth = 0;
 		uint16_t barcolor = 0;
 		uint8_t	divider = 0;
@@ -263,7 +263,7 @@ private:
 		uint16_t bc;
 		uint16_t ac;
 		bool redraw;
-		float range, TempY, level, i, data;
+		float stepval, range, TempY, level, i, data;
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 };
 
@@ -276,11 +276,6 @@ public:
 
 	void init(float GraphXLoc, float GraphYLoc, float GraphWidth, float GraphHeight, float ScaleLow, float ScaleHigh, float ScaleInc, const char *Title, uint16_t TextColor, uint16_t BorderColor, uint16_t BarColor, uint16_t BarBlankColor, uint16_t BackgroundColor,const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &ScaleFont );
 
-
-	// init for bar chart with segments
-	void init(float GraphXLoc, float GraphYLoc, float GraphWidth, float ScaleLow, float ScaleHigh, uint16_t NumberOfBars, float BarHeight, uint8_t DividerSize, const char *Title, uint16_t TextColor, uint16_t ColorLow, uint16_t ColorMed, uint16_t ColorHigh, uint16_t ColorNull,const ILI9341_t3_font_t &TitleFont );
-	
-	
 	void setBarColor(uint16_t val = 0xF800);
 
 	void draw(float val);
@@ -294,9 +289,13 @@ public:
 	void showScale(bool val);
 	
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
-	void setBars(uint16_t Left, uint16_t Top,uint8_t BarHeight, uint16_t NumberofBars,uint8_t DividerSize);
+	void useSegmentBars(bool val);
+	void setBars(uint8_t BarHeight, uint8_t DividerSize);
+	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
+	void setSectionSizeActual(float Divider1, float Divider2);
+	float getBars();
 	float getActualHeight();
 
 private:
@@ -305,7 +304,7 @@ private:
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
-		char	ti[20];
+		char	ti[40];
 		char	sc[20];
 		char	cc[2] = "D";
 		char	text[30];
@@ -389,6 +388,8 @@ public:
 	void setMarkerSize(int ID, byte val);
 
 	void setLineThickness(int ID, byte val);
+	
+	void setLineColor(int ID, uint16_t LineColor);
 
 	void setTitle(const char *Title);
 
@@ -432,8 +433,9 @@ private:
 		uint16_t gc;
 		uint16_t bc;
 		uint16_t pc;
-		byte pdia[20];
-		byte linet[20];
+		uint16_t linecolor[10];
+		byte pdia[10];
+		byte linet[10];
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 };
