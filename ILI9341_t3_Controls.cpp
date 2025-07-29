@@ -1,41 +1,10 @@
-/*
-  The MIT License (MIT)
-
-  library writen by Kris Kasprzak
-  
-  Permission is hereby granted, free of charge, to any person obtaining a copy of
-  this software and associated documentation files (the "Software"), to deal in
-  the Software without restriction, including without limitation the rights to
-  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-  the Software, and to permit persons to whom the Software is furnished to do so,
-  subject to the following conditions:
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-  On a personal note, if you develop an application or product using this library 
-  and make millions of dollars, I'm happy for you!
-	
-*/
-
-
 #include "ILI9341_t3_Controls.h"
 #include <ILI9341_t3.h>     // fast display driver lib
 
 float degtorad = .0174532778;
 
-
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 arc shaped bar chart
-
-
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BarChartA::BarChartA(ILI9341_t3 *Display){
