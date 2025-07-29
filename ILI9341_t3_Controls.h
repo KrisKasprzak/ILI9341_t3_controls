@@ -21,18 +21,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 On a personal note, if you develop an application or product using this library
 and make millions of dollars, I'm happy for you!
 
-rev		date			author				change
-1.0		9/2019			kasprzak			initial code
-2.0		9/2020			kasprzak			added shapes and sizes for handles
-3.0		10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
-4.0		11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
-5.0		11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
-5.1		11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
-5.4		12/2021			kasprzak			added ring sliders 
-5.5 		11/2022			kasprzak			added better text centering control
-6.2 		3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
+rev	date			author				change
+1.0	9/2019			kasprzak			initial code
+2.0	9/2020			kasprzak			added shapes and sizes for handles
+3.0	10/2020			kasprzak			fixed some repaint issues in CGraph, added marker support, added Button class with tons of methods
+4.0	11/2020			kasprzak			fixed bugs added Button, Checkbox, OptionButton classes
+5.0	11/2020			kasprzak			modified sliders, option and check to return true/false if pressed, and actual value stored in value property
+5.1	11/2020			kasprzak			added automatic "blank out" old handle support insided draw() method in sliderH and SliderV (really needed when a slide is redrawn based on input other than a finger slide (encoder)
+5.4	12/2021			kasprzak			added ring sliders 
+5.5 	11/2022			kasprzak			added better text centering control
+6.2 	3/2025			kasprzak			initialize default graph count to 0, and added #define MAX_GRAPHS 10 
 7.0 	11/2022			kasprzak			added bar segment option for horizontal and vertical bar gauges
 8.0 	5/2025			kasprzak			added arc shape bar segment class
+8.0 	7/2025			kasprzak			fixed minor issues in segment option for bar chart
 
 */
 
@@ -213,11 +214,10 @@ public:
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
 	
 	void useSegmentBars(bool val);
-	void setBars(float BarWidth, uint8_t DividerSize);
+	void setBars(uint16_t NumberofBars, float BarWidth, uint8_t DividerSize);
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
-	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
 	float getActualWidth();
 
@@ -290,11 +290,10 @@ public:
 	
 	// allows bar segments as opposed to one large block, construct the object then override with these methods
 	void useSegmentBars(bool val);
-	void setBars(uint8_t BarHeight, uint8_t DividerSize);
+	void setBars(uint16_t NumberofBars, uint8_t BarHeight, uint8_t DividerSize);
 	void setSize(uint16_t Left, uint16_t Top, uint16_t Wide, uint16_t High, uint8_t Divider);
 	void setSectionColors(uint16_t ColorL, uint16_t ColorM,uint16_t ColorH, uint16_t ColorV);
 	void setSectionSize(float Divider1, float Divider2);
-	void setSectionSizeActual(float Divider1, float Divider2);
 	float getBars();
 	float getActualHeight();
 
