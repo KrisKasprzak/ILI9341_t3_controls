@@ -3,8 +3,11 @@
 
 float degtorad = .0174532778;
 
+
 /*//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 arc shaped bar chart
+
 *///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BarChartA::BarChartA(ILI9341_t3 *Display){
@@ -172,7 +175,7 @@ void BarChartH::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	bars = (High - ScaleLow) / ScaleInc;	
 	barwidth = gw / bars;	
 	
-	strncpy(titxt, Title, 40);
+	strncpy(titxt, Title, MAXCHARLEN-1);
 	bartype = false;
 	tf = TitleFont;
 	sf = ScaleFont;
@@ -279,23 +282,6 @@ void BarChartH::draw(float val){
 	divider1 = map(divider_1, Low, High, 0, bars);		
 	divider2 = map(divider_2, Low, High, 0, bars);
 	
-	Serial.print(bars);
-	Serial.print(", ");
-	Serial.print(Low);
-	Serial.print(", ");
-	Serial.print(High);
-	Serial.print(", ");	
-	Serial.print(divider_1);
-	Serial.print(", ");
-	Serial.print(divider_2);
-	Serial.print(", ");
-	Serial.print(divider1);
-	Serial.print(", ");
-	Serial.print(divider2);
-	Serial.println();
-	
-		
-		
 	for (i = 1; i < bars; i++){		
 
 		if (i <= (divider1)){
@@ -419,7 +405,7 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	gy = GraphYLoc;
 	gw = GraphWidth;
 	gh = GraphHeight;
-	strncpy(ti, Title, 40);
+	strncpy(ti, Title, MAXCHARLEN-1);
 	bartype = false;
 	divider = 1; // distance between bars (we are just going to reduce width)
 	bars = (High - Low) / Inc;	
@@ -487,7 +473,7 @@ void BarChartV::draw(float val){
 		if (st){
 			d->setTextColor(tc, bc);
 			d->setFont(tf);
-			tHi =sf.cap_height * 2 + 5;
+			tHi =sf.cap_height + 15;
 			d->setCursor(gx , gy - gh -tHi );
 			d->print(ti);
 		}
@@ -659,13 +645,11 @@ CGraph::CGraph(ILI9341_t3 *disp, float GraphXLoc, float GraphYLoc, float GraphWi
 		
 }
 
-
 void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor, uint16_t PlotColor, const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &AxisFont ){
 
-	strncpy(title, Title, 40);
-	strncpy(xatitle, XAxis, 40);
-	strncpy(yatitle, YAxis, 40);
-	
+	strncpy(title, Title, MAXCHARLEN-1);
+	strncpy(xatitle, XAxis, MAXCHARLEN-1);
+	strncpy(yatitle, YAxis, MAXCHARLEN-1);	
 
 	tf = TitleFont;
 	af = AxisFont;
@@ -696,18 +680,16 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 	}
 
 int CGraph::add(const char *name, uint16_t color){
-	
-	// max number of plots is 10
-	if (ID >= MAX_GRAPHS){
+		
+	if (ID > MAXOPTIONS){
 		return -1;
 	}
 	pdia[ID] = 0;
 	linet[ID] = 1;	
-	strncpy(dl[ID], name, 30);
+	dl[ID] = name;
 	dc[ID] = color;
 	HaveFirstPoint[ID] = false;
 	ID++;	
-		
 	return ID-1;
 	
 }
@@ -719,8 +701,7 @@ void CGraph::setX(float xpoint){
 }
 
 void CGraph::setLineColor(int ID, uint16_t LineColor){
-	
-	
+		
 	dc[ID] = LineColor;
 	
 }
@@ -743,30 +724,29 @@ void CGraph::plot(int cID, float y){
 		RedrawGraph = false;
 		drawGraph();
 	}
-	
+	if (y != y){
+		y = YLow;
+	}
 	// plot the data
 	XPoint = MapFloat(x, XLow, XHigh, gx, gx + gw);
 	YPoint = MapFloat(y, YHigh, YLow, gy - gh, gy);
-	  
+
+	
 	if ((YPoint > gy)) {
 		YPoint = gy;
 	}
-	if (YPoint < (gy - gh)) {
+	if (YPoint < (gy - gh)) {	
 		YPoint = gy - gh;
 	}
 	
-
 	if ((XPoint > gx) && (XPoint < gx + gw)) {
 		if (HaveFirstPoint[cID]){
 			for(j = 0; j < linet[cID]; j++){
-				d->drawLine(oXPoint[cID], oYPoint[cID]+j, XPoint, YPoint+j, dc[cID]);
-				
+				d->drawLine(oXPoint[cID], oYPoint[cID]+j, XPoint, YPoint+j, dc[cID]);				
 			}
 
-			// d->drawLine(oXPoint[cID], oYPoint[cID], XPoint, YPoint, dc[cID]);
 			if ( pdia[cID] > 1){
 				d->fillCircle(XPoint, YPoint, pdia[cID],  dc[cID]);
-				// d->fillRect(XPoint -  pdia[cID]/2, YPoint-  pdia[cID]/2, pdia[cID],   pdia[cID], dc[cID]);
 			}
 		}
 	}
@@ -776,14 +756,12 @@ void CGraph::plot(int cID, float y){
 	oXPoint[cID] = XPoint;
 
 	// test to see if we need to redraw
-
 	if (XPoint + 2 > gx + gw) {
 		Delta = XHigh - (XLow);
 		XLow = XHigh;
 		XHigh = XHigh + Delta;
 		RedrawGraph = true;
-		HaveFirstPoint[cID] = false;
-	
+		HaveFirstPoint[cID] = false;	
 	}
  
 }
@@ -802,16 +780,16 @@ void CGraph::setLineThickness(int cID, byte val){
 
 void CGraph::setTitle(const char *Title){
 
-	strncpy(title, Title, 40);
+	strncpy(title, Title, MAXCHARLEN-1);
 
 }
-
+/*
 void CGraph::setXAxisName(const char *XAxis){
 
-	strncpy(xatitle, XAxis, 40);
+	strncpy(xatitle, XAxis, MAXCHARLEN-1);
 
 }
-
+*/
 void CGraph::setXTextOffset(int val){
 	
 	XScaleOffset = val;
@@ -827,13 +805,13 @@ void CGraph::setXTextScale(float val){
 	
 	XTextScale = val;
 }
-
+/*
 void CGraph::setYAxisName(const char *YAxis){
 
-	strncpy(yatitle, YAxis, 40);
+	strncpy(yatitle, YAxis, MAXCHARLEN-1);
 
 }
-
+*/
 void CGraph::resetStart(int ID){
 
 	HaveFirstPoint[ID] = false;
@@ -853,9 +831,6 @@ void CGraph::drawGraph() {
 
 	float xDiv =  ((XHigh-XLow)/XInc);
 	float yDiv = ((YHigh-YLow)/YInc);
-
-
-
 	float ylen = gh /  yDiv;
 	float xlen = gw / xDiv;
 
@@ -889,7 +864,10 @@ void CGraph::drawGraph() {
 		else {
 			XDec = 0;
 		}
-
+		
+		//hard code since not working for < 10, fix later
+		XDec = 1;
+		
 		//get text offsets
 
 		if (sxs){
@@ -2582,5 +2560,4 @@ void SliderD::setHandleSize(int value){
 void SliderD::setPressDebounce(byte Debounce) { 
 	debounce = Debounce;
 }
-
 
