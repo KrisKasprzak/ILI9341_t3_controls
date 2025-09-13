@@ -37,8 +37,6 @@ rev	date			author				change
 
 */
 
-
-
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
@@ -77,8 +75,6 @@ rev	date			author				change
 
 #define DISABLED 0
 #define ENABLED 1
-
-#define MAX_GRAPHS 10
 
 /*
 #define	C_BLACK   		0x0000
@@ -141,8 +137,8 @@ rev	date			author				change
 #define C_DISABLE_LIGHT 0xC618
 #define C_DISABLE_MED	0x7BCF
 #define C_DISABLE_DARK	0x3186
-#define MAXCHARLEN 30
-
+#define MAXCHARLEN 31
+#define MAXOPTIONS 13
 
 class BarChartA {
 
@@ -227,10 +223,10 @@ private:
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
-		char	titxt[40];
-		char	sc[20];
+		char	titxt[MAXCHARLEN];
+		char	sc[MAXCHARLEN];
 		char	cc[2] = "D";
-		char	text[30];
+		char	text[MAXCHARLEN];
 		float	XLow;
 		float	XHigh;
 		float	XInc;
@@ -303,10 +299,10 @@ private:
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	sf;
 		bool	st = true, ss = true;
-		char	ti[40];
-		char	sc[20];
+		char	ti[MAXCHARLEN];
+		char	sc[MAXCHARLEN];
 		char	cc[2] = "D";
-		char	text[30];
+		char	text[MAXCHARLEN];
 		float	XLow;
 		float	XHigh;
 		float	XInc;
@@ -355,8 +351,8 @@ public:
 	void plot(int ID, float y);
 
 	void setX(float x);
-
-	int add(const char * DataLabel, uint16_t DataColor );
+// kris
+	int add(const char *DataLabel, uint16_t DataColor );
 
 	void setYAxis(float Ylow, float YHigh, float YInc);
 
@@ -392,14 +388,15 @@ public:
 
 	void setTitle(const char *Title);
 
-	void setXAxisName(const char *Name);
+	//void setXAxisName(char *Name);
 
-	void setYAxisName(const char *Name);
+	//void setYAxisName(char *Name);
 
 	void drawGraph();
 
 private:
 
+// kris
 		ILI9341_t3 			*d;
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	af;
@@ -416,16 +413,15 @@ private:
 		bool HaveFirstPoint[10];
 		float	XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
 		float	XDec = 0.0, YDec = 0.0;
-		char	text[30];
+		char	text[MAXCHARLEN];
 		byte	oOrientation = 0;
 		float	gx, gy, gw, gh;
 		int StartPointX, StartPointY, XScaleOffset, YScaleOffset, YlegendOffset;
-		char buf0[20], buf1[20], buf2[20], buf3[20], buf4[20], buf5[20], buf6[20], buf7[20], buf8[20], buf9[20];
-		char    *dl[20] = {buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf6, buf8, buf9};
-		char	title[40];
-		byte tl = 0; // title location
-		char	xatitle[40];
-		char	yatitle[40];
+		const char    *dl[MAXOPTIONS];
+		char	title[MAXCHARLEN+1];
+		byte tl = 0; 
+		char	xatitle[MAXCHARLEN+1];
+		char	yatitle[MAXCHARLEN+1];
 		uint16_t tc;
 		uint16_t dc[10];
 		uint16_t ac;
@@ -699,7 +695,7 @@ public:
 	void init(int16_t ButtonX, int16_t ButtonY, uint8_t ButtonWidth, uint8_t ButtonHeight,
 		uint16_t OutlineColor, uint16_t ButtonColor, uint16_t TextColor, uint16_t BackgroundColor,
 		const char *ButtonText, int16_t TextOffsetX, int16_t TextOffsetY, const ILI9341_t3_font_t &TextFont ) {
-
+// kris
 		x = ButtonX;
 		y = ButtonY;
 		w = ButtonWidth;
@@ -910,7 +906,6 @@ public:
 				}
 			}
 			else {
-
 					if (Has565Icon){
 						draw565Bitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, upicon, iconw, iconh );
 					}
@@ -918,9 +913,7 @@ public:
 						drawMonoBitmap(x - (w/2) + x_offset, y-(h/2)+ y_offset, monoicon, iconh, iconw, text );
 					}
 			}
-		}
-
-				
+		}				
 	}
 
 	bool press(int16_t ScreenX, int16_t ScreenY) {
@@ -964,12 +957,10 @@ public:
 	}
 
 	void disable() { 
-		enabled = false;
-		
+		enabled = false;		
 	}
 	void enable() { 
-		enabled = true;
-		
+		enabled = true;		
 	}
 
 
@@ -1002,7 +993,7 @@ public:
 	}
 
 	void setText(const char *ButtonText) {
-		strncpy(label, ButtonText, 20);
+		strncpy(label, ButtonText, MAXCHARLEN+1);
 	}
 
 	void setCornerRadius(int radius) {
@@ -1072,7 +1063,7 @@ private:
 	int16_t iconh, iconw;
 	bool redraw;
 	uint16_t outlinecolor, fillcolor, textcolor, backcolor, disablecolorfill, disablecolortext;
-	char label[20];
+	char label[MAXCHARLEN + 1];
 	bool Has565Icon;
 	bool HasMonoIcon;
 	const uint16_t *upicon;
