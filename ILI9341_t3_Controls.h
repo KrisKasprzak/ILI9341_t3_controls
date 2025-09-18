@@ -37,10 +37,12 @@ rev	date			author				change
 
 */
 
+
+
 #ifndef ILI9341_t3_CONTROLS_H
 #define ILI9341_t3_CONTROLS_H
 
-#define  ILI9341_t3_CONTROLS_VER 8.0
+#define  ILI9341_t3_CONTROLS_VER 8.1
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -274,6 +276,8 @@ public:
 
 	void setBarColor(uint16_t val = 0xF800);
 
+	void setColors(int16_t TextColor, uint16_t BorderColor, uint16_t BarColor, uint16_t BarBlankColor, uint16_t BackgroundColor);
+
 	void draw(float val);
 	
 	void refresh();
@@ -346,17 +350,19 @@ public:
 
 	CGraph(ILI9341_t3 *disp, float GraphXLoc, float GraphYLoc, float GraphWidth, float GraphHeight, float XAxisLow, float XAxisHigh, float XAxisInc, float YAxisLow, float YAxisHigh, float YAxisInc);
 
-	void init(const char *Title, const char *XAxis, const char *YAxis, uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor,uint16_t PlotkColor, const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &AxisFont );
+	void init(const char *Title, const char *XAxis, const char *YAxis, uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor,uint16_t PlotColor, const ILI9341_t3_font_t &TitleFont , const ILI9341_t3_font_t &AxisFont );
 
 	void plot(int ID, float y);
 
 	void setX(float x);
-// kris
+
 	int add(const char *DataLabel, uint16_t DataColor );
 
 	void setYAxis(float Ylow, float YHigh, float YInc);
 
 	void setXAxis(float XAxisLow, float XAxisHigh, float XAxisInc);
+	
+	void setColors(uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor,uint16_t PlotColor);
 
 	void showTitle(bool val);
 
