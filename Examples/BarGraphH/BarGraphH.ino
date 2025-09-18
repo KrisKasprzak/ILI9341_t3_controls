@@ -27,6 +27,7 @@
 
 #define FONT_TITLE Arial_24
 #define FONT_DATA Arial_10
+
 #define TFT_CS 9
 #define TFT_DC 2
 #define LED_PIN A9
@@ -65,15 +66,8 @@ float a7Volts, a8Volts;
 BarChartH A7Volts(&Display);
 BarChartH A8Volts(&Display);
 
-char FileName[8] = "nn.bmp";
-
-uint8_t fnum = 0, digit10=0, digit1=0;
-
 void setup() {
   Serial.begin(115200);
-
-  pinMode(A1, INPUT);
-  pinMode(A2, OUTPUT);
 
   Display.begin();
   Display.setRotation(1);
@@ -81,31 +75,32 @@ void setup() {
   digitalWrite(LED_PIN, HIGH);
 
   // step 3 initialize
-  // this init will create bar segment type display
-  A7Volts.init(10, 55, 50, 0, 3.3, 50, 5,1,"NULL", ILI9341_WHITE, ILI9341_GREEN, ILI9341_YELLOW, ILI9341_RED, 0x2104, FONT_TITLE);
-
-  // this init will create a simple solid bar graph
-  A8Volts.init(V_XORIGIN, V_YORIGIN, V_WIDE, V_HEIGHT, V_LOWSCALE, V_HIGHSCALE, V_SCALEINC, "A8 Voltage", TEXT_COLOR, BORDER_COLOR, BAR_COLOR,
-               NULL_COLOR, BACK_COLOR, FONT_TITLE, FONT_DATA);
+  A7Volts.init(B_XORIGIN, B_YORIGIN, B_WIDE, B_HEIGHT, B_LOWSCALE, B_HIGHSCALE, B_SCALEINC, "A7 Voltage", ILI9341_WHITE, BORDERCOLOR, ILI9341_RED, ILI9341_BLACK, BACKCOLOR, FONT_TITLE, FONT_DATA);
 
   // optional hide scales
-  A7Volts.showScale(false); // will have no effect since I don't support scale on segment graphps
-  A7Volts.showTitle(false);
+  A7Volts.showScale(false);
+  //A7Volts.showTitle(false);
+  // optional draw bars with segments (looks like a segment UV meter)
+  A7Volts.useSegmentBars(true);
   // set colors for 3 color segments and 4th for null color
-  // A7Volts.setSectionColors(ILI9341_GREEN, ILI9341_YELLOW, ILI9341_RED, 0x2104);
-  A7Volts.setSectionSize(2.8, 3);
+  A7Volts.setSectionColors(ILI9341_GREEN, ILI9341_YELLOW, ILI9341_RED, 0x2104);
+  // how many bars for each section, where sections based on the scale
+  A7Volts.setSectionSize(2.5, 3);
+  // you should set the bars for the scale, number of bars, bar thickness, and gap between bars
+  // I opted for manually defining the bars so multiple scales will look the same (as opposed to computing bar thickness)
+  A7Volts.setBars(40, 5, 1);
 
-  // reset the size
-  // A7Volts.setBars(Left, Top, BarWidth, NumberofBars, DividerSize);
-  // Serial.println(A7Volts.getActualWidth());
+  // initalize another for a different example
 
+  A8Volts.init(V_XORIGIN, V_YORIGIN, V_WIDE, V_HEIGHT, V_LOWSCALE, V_HIGHSCALE, V_SCALEINC, "A8 Voltage", TEXT_COLOR, BORDER_COLOR, BAR_COLOR, 
+  NULL_COLOR, BACK_COLOR, FONT_TITLE, FONT_DATA);
 }
 
 void loop() {
 
   // step 4 get some data
-  a7Bits = analogRead(A1);
-  a8Bits = analogRead(A2);
+  a7Bits = analogRead(A7);
+  a8Bits = analogRead(A8);
 
   a7Volts = a7Bits * 3.3 / 1024.0f;
   a8Volts = a8Bits * 3.3 / 1024.0f;
