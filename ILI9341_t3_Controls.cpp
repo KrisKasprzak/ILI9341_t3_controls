@@ -422,6 +422,14 @@ void BarChartV::init(float GraphXLoc, float GraphYLoc, float GraphWidth, float G
 	
 }
 
+void BarChartV::setColors(int16_t TextColor, uint16_t BorderColor, uint16_t BarColor, uint16_t BarBlankColor, uint16_t BackgroundColor){
+	tc = TextColor;
+	oc = BorderColor;
+	rc = BarColor;
+	ac = BarBlankColor;
+	bc = BackgroundColor;	
+}
+
 
 void BarChartV::draw(float val){
 	
@@ -653,8 +661,8 @@ void CGraph::init(const char *Title, const char *XAxis, const char *YAxis, uint1
 
 	tf = TitleFont;
 	af = AxisFont;
+	
 	tc = TextColor;
-
 	gc = GridColor;
 	ac = AxisColor;
 	bc = BackColor;
@@ -691,6 +699,17 @@ int CGraph::add(const char *name, uint16_t color){
 	HaveFirstPoint[ID] = false;
 	ID++;	
 	return ID-1;
+	
+}
+
+
+void CGraph::setColors(uint16_t TextColor, uint16_t GridColor, uint16_t AxisColor, uint16_t BackColor,uint16_t PlotColor){
+	
+	tc = TextColor;
+	gc = GridColor;
+	ac = AxisColor;
+	bc = BackColor;
+	pc = PlotColor;
 	
 }
 
@@ -866,7 +885,7 @@ void CGraph::drawGraph() {
 		}
 		
 		//hard code since not working for < 10, fix later
-		XDec = 1;
+		// XDec = 1;
 		
 		//get text offsets
 
