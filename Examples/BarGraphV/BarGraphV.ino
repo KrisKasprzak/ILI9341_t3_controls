@@ -47,29 +47,23 @@ void setup() {
   Display.fillScreen(ILI9341_BLACK);
 
   // step 3 initialize the bar chart objects
-  A7Volts.init(10, 230, 100, 198, 0.0, 3.3, 0.1, "A7", ILI9341_WHITE, ILI9341_WHITE, ILI9341_RED, ILI9341_BLACK, ILI9341_BLACK, FONT_TITLE, FONT_DATA);
+  A7Volts.init(10, 230, 100, 198, 0.0, 4.0, 0.5, "A7", ILI9341_WHITE, ILI9341_WHITE, ILI9341_RED, ILI9341_BLACK, ILI9341_BLACK, FONT_TITLE, FONT_DATA);
 
   // optional hide scales
-  A7Volts.showScale(false);
-  A7Volts.showTitle(false);
+  //A7Volts.showScale(false);
+  //A7Volts.showTitle(false);
 
   // optional draw bars with segments (looks like a segment UV meter)
   A7Volts.useSegmentBars(true);
   // set colors for 3 color segments and 4th for null color
   A7Volts.setSectionColors(ILI9341_GREEN, ILI9341_YELLOW, ILI9341_RED, 0x2104);
-  // how many bars for each (these are percentages (70% for green, 20% for yellow, and rest red))
-  A7Volts.setSectionSize(.70, .90);
-  // independent scale for bars (so you can have say 50 bars but numerical scale of 1-2-3-4-5)
-  A7Volts.setBars(.1, 1);
-  // caution you will need to do some math to ensure the resulting total bar height is within you set height
-  // bar height is computed and if not and integer, we'll make it one. Makes guarenteeting no odd dividers but height may be off
-  // of you must have fixed height and same divider bars, make sure barheight is integer
-
-  // bars = (ScaleHigh - ScaleLow) / BarInc;
-  // barheight = GraphHeight / bars;
-  // note: uint16_t used for barheight, but this will return a float so you can verify graph hight and bar inc scaler
-  Serial.println(A7Volts.getBars());
-  Serial.println(A7Volts.getBarHeight());
+  // how many bars for each section, where sections based on the scale
+  A7Volts.setSectionSize(2.5, 3);
+  // you should set the bars for the scale, number of bars, bar thickness, and gap between bars
+  // I opted for manually defining the bars so multiple scales will look the same (as opposed to computing bar thickness)
+  // only drag is if you show the scale, you need to compute how many bars
+  // here goal is 30 bars 5+1 pixels high, so overall bar height must be 198 for scale height to match
+  A7Volts.setBars(33, 5, 1);
 
   // initalize another for a different example
   A8Volts.init(200, 230, 50, 180, 0, 4.0, 0.5, "A8", ILI9341_WHITE, ILI9341_BLACK, ILI9341_GREEN, ILI9341_BLACK, ILI9341_BLACK, FONT_TITLE, FONT_DATA);
