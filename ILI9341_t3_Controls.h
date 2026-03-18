@@ -131,7 +131,7 @@ rev	date			author				change
 #define CORNER_AUTO   -1
 #define CORNER_SQUARE  0
 
-#define  MAX_OPTION 20
+#define  MAX_OPTION 10
 #define OPTION_BUTTON_RADIUS 10
 
 #define CHECKBOX_SIZE 20
@@ -139,8 +139,8 @@ rev	date			author				change
 #define C_DISABLE_LIGHT 0xC618
 #define C_DISABLE_MED	0x7BCF
 #define C_DISABLE_DARK	0x3186
-#define MAXCHARLEN 31
-#define MAXOPTIONS 13
+#define MAXCHARLEN 40
+#define MAXOPTIONS 11
 
 class BarChartA {
 
@@ -372,7 +372,7 @@ public:
 
 	void drawLegend(byte Location);
 	
-	void resetStart(int ID);
+	void resetStart(int cID);
 	
 	void showXScale(bool val);
 	
@@ -406,18 +406,18 @@ private:
 		ILI9341_t3 			*d;
 		ILI9341_t3_font_t	tf;
 		ILI9341_t3_font_t	af;
-		int ID = 0;
+		uint8_t ID = 0;
 		float x, y;
 		float	i, j;
 		bool	st, sl, sal, sxs, sys;
 		float	Delta;
-		int k;
+		uint8_t k;
 		float	XLow, XHigh, XInc;
 		float	YLow, YHigh, YInc;
 		float XTextScale;
 		bool RedrawGraph = true;
-		bool HaveFirstPoint[10];
-		float	XPoint, YPoint, oXPoint[10], oYPoint[10], TextHeight;
+		bool HaveFirstPoint[MAXOPTIONS];
+		float	XPoint, YPoint, oXPoint[MAXOPTIONS], oYPoint[MAXOPTIONS], TextHeight;
 		float	XDec = 0.0, YDec = 0.0;
 		char	text[MAXCHARLEN];
 		byte	oOrientation = 0;
@@ -429,14 +429,14 @@ private:
 		char	xatitle[MAXCHARLEN+1];
 		char	yatitle[MAXCHARLEN+1];
 		uint16_t tc;
-		uint16_t dc[10];
+		uint16_t dc[MAXOPTIONS];
 		uint16_t ac;
 		uint16_t gc;
 		uint16_t bc;
 		uint16_t pc;
-		uint16_t linecolor[10];
-		byte pdia[10];
-		byte linet[10];
+		uint16_t linecolor[MAXOPTIONS];
+		byte pdia[MAXOPTIONS];
+		byte linet[MAXOPTIONS];
 		float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
 
 };
